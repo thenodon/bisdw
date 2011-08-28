@@ -1,0 +1,40 @@
+#!/bin/sh
+#
+# Copyright (C) 2009 Anders Håål, Ingenjorsbyn AB
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# The program starts any java class with main method located in the package
+# com.ingby.socbox.bischeck
+# The program is called from the init script bischeckd, but can also be
+# used directly from command line
+#
+#
+# The script create a correct dom document by adding a root tag.
+# The file will be renamed from .sxml to .xml when complete.
+# lsof is used to check that the .sxml file is opened by some one else before
+# it starts to process it.  
+#
+
+
+for i in *.sxml ; do 
+  lsof $i > /dev/null
+  if [ $? -eq 1 ] ; then
+    filename=$(basename $i .sxml)
+    echo "<shipments>" > $filename.tmp
+    cat $i >> $filename.tmp
+    echo "</shipments>" >> $filename.tmp
+    mv $filename.tmp $filename.xml
+  fi
+done

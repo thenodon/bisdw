@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bisdw xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="../src/main/resources/bisdw.xsd">
+	<etljob>
+		<name>shipment</name>
+		<desc>Shipment database</desc>
+		<schedule>0 */1 * * * ?</schedule>
+
+		<etlconfig name="shp_ship_swe">
+			<desc>The shp_ship table Sweden</desc>
+			<class>com.ingby.socbox.bisdw.etlprovider.ETLScriptella</class>
+			<order>100</order>
+			<property>
+				<key>configFile</key>
+				<value>shp_ship_swe.xml</value>
+			</property>
+		</etlconfig>
+
+		<etlconfig name="shp_ship_fin">
+			<desc>The shp_ship table Finland</desc>
+			<class>com.ingby.socbox.bisdw.etlprovider.ETLScriptella</class>
+			<order>10</order>
+            		<property>
+				<key>configFile</key>
+				<value>shp_ship_fin.xml</value>
+			</property>
+		</etlconfig>
+
+	</etljob>
+
+
+	<etljob>
+		<name>shipment_total</name>
+		<desc>Shipment totals</desc>
+		<schedule>0 */1 * * * ?</schedule>
+		<etlconfig name="shp_ship_total">
+			<desc>Total on weight, pieces and accounts sxml generation</desc>
+			<class>com.ingby.socbox.bisdw.etlprovider.ETLScriptella</class>
+			<property>
+				<key>configFile</key>
+				<value>shp_total.xml</value>
+			</property>
+		</etlconfig>
+	</etljob>
+
+
+</bisdw>
+

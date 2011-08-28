@@ -1,0 +1,7 @@
+BISDW="."
+
+rm -rf $BISDW/src/main/generated/*
+
+for pack in bisdw properties  ; do
+   xjc -d $BISDW/src/main/generated/ -p com.ingby.socbox.bisdw.xsd.$pack -xmlschema $BISDW/src/main/resources/$pack.xsd -b $BISDW/src/main/resources/$pack.xjb
+done
