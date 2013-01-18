@@ -16,8 +16,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-#
-# 
 # 
 ###########################################################
 
@@ -113,10 +111,30 @@ function checkpackage() {
   fi 
 }
 
+function distrocheck() {
+if [ -x /usr/bin/lsb_release ] ; then
+  DISTRIBUTION=$(lsb_release -i | cut -f2 -d: | sed -e "s/\t//" | tr A-Z a-z)
+  if [ "$DISTRIBUTION" != "unknown" ] ; then
+    VERSION=$(lsb_release -r | cut -f2 -d: | sed -e "s/\t//" | tr A-Z a-z)
+    echo ${DISTRIBUTION}:${VERSION}
+  fi
+elif [ -f /etc/redhat-release ] ; then
+  DISTRIBUTION=$(cat /etc/redhat-release | tr '[:upper:]' '[:lower:]'| tr -s " "| cut -d" " -f1)
+  VERSION=$(cat /etc/redhat-release | tr '[:upper:]' '[:lower:]'| tr -s " "| cut -d" " -f3)
+  echo ${DISTRIBUTION}:${VERSION}
+elif [ -f /etc/debian_version ] ; then
+  DISTRIBUTION=debian
+  VERSION=$(cat /etc/debian_version)
+  echo ${DISTRIBUTION}:${VERSION}
+else
+   echo ""
+fi
+}
+
 function usage {
   echo "Usage: $0: -U user -I directory -J java_home "
   echo "-u show usage"
-  echo "-U the user name to install BISDWcheck as and run the daemon as - default nagios"
+  echo "-U the user name to install bisdw as and run the daemon as - default nagios"
   echo "-J java home directory - default is none"
   echo "-I installation directory for bisdw - default /opt/socbox/addons/bisdw"
   echo "-R unistall - permanently remove the installation" 
@@ -141,9 +159,12 @@ tempdir=`mktemp -d`
 USERINIT=nagios
 NAGIOSHOST=localhost
 BISDW="/opt/socbox/addons/bisdw"
+
 JAVA_HOME=""
 unistall=false
 upgrade=false
+DISTRO=""
+DISTROVERS=""
 
 VERSION=$(basename `pwd` | sed -e "s/^.*-//")
 
@@ -152,8 +173,9 @@ echo "Welcome to bisdw $VERSION installer"
 echo "===================================="
 echo "Copyright Anders Håål, Ingenjörsbyn AB 2011"
 echo "Licensed under GPL version 2"
+echo 
 
-while getopts U:I:J:uR:X name
+while getopts U:I:J:uRXd: name
 do
   case $name in
     U)  USERINIT="$OPTARG";;
@@ -161,14 +183,58 @@ do
     J)  JAVA_HOME="$OPTARG";;
     X)  upgrade=true;;
     R)  uninstall=true;;
+    d)  DISTRO="$OPTARG";;
     u)  usage; exit 0;;
   esac
 done
 
 shift $(($OPTIND - 1))
 
+
+#########################
+## Check distribution
+#########################
+# Need to find a way to determine and pass on.
+if [ "x$DISTRO" = "x" ] ; then
+  DISTRO=$(distrocheck | cut -f1 -d:)
+  DISTROVERS=$(distrocheck | cut -f2 -d:)
+  if [ "x$DISTRO" = "x" ] ; then
+    echo "Can not determine distribution - please try set distribution name with -d"
+    echo "Supported distributions are rh, rhel, centos and debian"
+    exit 1
+  fi 
+else
+  DISTRO=$(echo $DISTRO | tr A-Z a-z)
+fi
+
+case ${DISTRO} in
+  rh|rhel|redhatenterpriseserver|centos|debian|ubuntu)
+      echo "Supported distribution - $DISTRO $DISTROVERS" 
+      ;;
+  *)
+      echo "Linux distribution $DISTRO is not supported"
+      echo "Supported distributions are rh, rhel, centos and debian" 
+      exit 1
+      ;;
+esac;
+
+
+
+
+#########################
+## Uninstall
+#########################
 if [ "x$uninstall" = "xtrue" ] ; then
-  echo uninstall
+  echo "Uninstall bisconf"
+  echo "Remove $BISDW"
+  rm -rf $BISDW
+  echo "Remove bisconfd from /etc/init.d"
+  if [ "$DISTRO" = "rhel" -o "$DISTRO" = "rh" -o "$DISTRO" = "redhatenterpriseserver" -o "$DISTRO" = "centos" ] ; then
+    chkconfig --del bisdwd
+  elif [ "$DISTRO" = "debian" -o "$DISTRO" = "ubuntu" ] ; then
+    update-rc.d bisdwd remove
+  fi
+  rm -f /etc/init.d/bisdwd
   exit 0
 fi
 
@@ -176,12 +242,12 @@ headline "Pre-installation verification"
 
 echo "Checking software dependencies"
 
-if [ "x$upgrade" = "xtrue" ] ; then
-  checkpackage sqlite
-  checkpackage javasqlite
-fi
+#if [ "x$upgrade" = "xtrue" ] ; then
+#  checkpackage sqlite
+#  checkpackage javasqlite
+#fi
 
-echo "All software installed"
+echo "All requiered software installed"
 
 
 id $USERINIT > /dev/null 2>&1
@@ -192,6 +258,9 @@ else
   echo User "$USERINIT exists"
 fi
 
+#########################
+## Pre install 
+#########################
 if [ "$upgrade" = "false" ] ; then
   if [ -d $BISDW ] ; then
     errormsg "Directory $BISDW already exists"
@@ -207,14 +276,23 @@ if [ "x$JAVA_HOME" = "x" ] ; then
     errormsg "Java do not exists in path $PATH"
     initerror=true
   fi
-elif [ ! -f $JAVA_HOME/bin/java ] ; then
+elif [ ! -x $JAVA_HOME/bin/java ] ; then
   errormsg "Java do not exists in $JAVA_HOME/bin"
   initerror=true
 else 
-  echo "Java runtime exists"
+  jver=$(java -version 2>&1 | awk '/version/ {print $3}' | awk -F . '{print $2}')
+  if [ $jver -qe 6 ] ; then 
+    echo "Java runtime exists"
+  else
+    errormsg "Java version is must be 6 or higher."
+    initerror=true
+  fi
 fi
   
 
+#########################
+## Upgrade check
+#########################
 if [ "$upgrade" = "true" ] ; then
 
   #Check if the current version can be upgraded
@@ -232,8 +310,6 @@ if [ "$upgrade" = "true" ] ; then
   migoldver=$(echo $migline | cut -d":" -f1)
   mignewver=$(echo $migline | cut -d":" -f2)
 
-  
-
   if [ "x$migoldver" = "x$oldversion" -a "x$mignewver" = "x$newversion" ] ; then
     echo "Upgrading bisdw from $oldversion to $newversion"
   else
@@ -243,6 +319,10 @@ if [ "$upgrade" = "true" ] ; then
   migscript=$(echo $migline | cut -d":" -f3)
 fi
 
+
+#########################
+## Exit if any error was detected
+#########################
 if [ "$initerror" = "true" ] ; then
   getout
 else 
@@ -251,7 +331,10 @@ fi
 
 
 
-# Create a backup directory of old bisdw installation
+#########################
+## Backup old install 
+#########################
+# Create a backup directory of old bisconf installation
 if [ "$upgrade" = "true" ] ; then
   service bisdwd stop
   echo "Moving old installation to $upgradedir"
@@ -259,18 +342,23 @@ if [ "$upgrade" = "true" ] ; then
 fi
 
 
+#########################
+## Install
+#########################
 headline "Do installation of bisdw $newversion"
 if [ ! -d $BISDW ] ; then
     echo "Create installation directory $BISDW"
     mkdir -p $BISDW
-    mkdir $BISDW/bin
-    mkdir $BISDW/customlib
     mkdir $BISDW/etc
-  
+    mkdir $BISDW/bin
+    mkdir $BISDW/lib
+    mkdir $BISDW/customlib
+
     echo "Copy files to installation directory"
-    cp -a lib $BISDW
-    cp -a resources $BISDW
-    cp -a etc $BISDW
+    cp -a lib $BISDW/
+    cp -a resources $BISDW/
+    cp -a etc $BISDW/
+    cp svninfo.txt $BISDW
     
     echo $VERSION > $BISDW/version.txt
     
@@ -287,7 +375,12 @@ if [ ! -d $BISDW ] ; then
     echo "Install init.d script bisdwd in /etc/init.d"
     cp $BISDW/bin/bisdwd /etc/init.d
     chmod 755 /etc/init.d/bisdwd
-    chkconfig --add bisdwd
+    
+    if [ "$DISTRO" = "rhel" -o "$DISTRO" = "rh" -o "$DISTRO" = "centos" ] ; then
+        chkconfig --add bisdwd
+    elif [ "$DISTRO" = "debian" -o "$DISTRO" = "ubuntu" ] ; then
+        update-rc.d bisdw defaults
+    fi
     
     echo "Change ownership and permissions to install user $USERINIT"
     chown -R $USERINIT:`id -gn $USERINIT` $BISDW
@@ -298,13 +391,20 @@ else
    getout
 fi
 
+#########################
+## Upgrade
+#########################
 if [ "$upgrade" = "true" ] ; then
   headline "Upgrade of bisdw $newversion with $oldversion"
   echo "Copy customlib jars"
   cp -a $upgradedir/customlib/* $BISDW/customlib/
   echo "Running migrations scripts"    
   sh ./migscripts/$migscript $BISDW $upgradedir
+  echo "Change ownership and permissions to install user $USERINIT after migsripts"
+  chown -R $USERINIT:`id -gn $USERINIT` $BISDW
+  echo "Upgrade complete"
 fi
+
 
 if [ ! -d $BISDW ] ; then
   echo "Set permission of the installation"
