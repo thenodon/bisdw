@@ -10,7 +10,7 @@ import org.quartz.JobExecutionException;
 
 public class ETLJobExecute implements Job {
 
-	static Logger  logger = Logger.getLogger(ETLJobExecute.class);
+	static final Logger LOGGER = Logger.getLogger(ETLJobExecute.class);
 
 	private ETLJob etljob;
 	
@@ -23,15 +23,16 @@ public class ETLJobExecute implements Job {
 
 		etljob = (ETLJob) dataMap.get("etljob");
 		
-		logger.debug("Executing Service: " + etljob.getName());
+		LOGGER.debug("Executing Service: " + etljob.getName());
         					
 		// Open the connection specific for the service
 		for (Map.Entry<String, ETLInf> etlentry: etljob.getETLs().entrySet()){
 			ETLInf etl = etlentry.getValue();
 			try {
+				
 				etl.runETL();
 			} catch (Exception e) {
-				logger.error("ETL execution failed for etl " + etl.getName() + " with exception " + e);
+				LOGGER.error("ETL execution failed for etl " + etl.getName() + " with exception " + e);
 			}
 		}
 	}
