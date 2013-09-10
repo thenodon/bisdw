@@ -1,0 +1,32 @@
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">
+<etl>
+  <properties>
+    filedepo=/tmp/shipment/
+  </properties>
+
+  <description>Express Shipment Sweden</description>
+
+  <connection id="mydb" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost/bisdwtest" user="testdb" password="testdb" />
+
+  <connection id="outfile" driver="text" url="$filedepo/shipment_${etl.date.today('yyyyMMdd-HH-mm-ss')}.sxml" />
+
+  <script connection-id="mydb">
+    CREATE TABLE IF NOT EXISTS shipment(ship_id int, no_pce int, tot_wght decimal(16,1) UNSIGNED NOT NULL) ;
+  </script>
+
+  <query connection-id="mydb">
+    <!-- Select all shipments with pckp_dt TODAY and inbnd_ind = O from shipmentdb-->
+    SELECT ship_id, no_pce, tot_wght FROM shipment;
+
+    <!-- for each row execute a script -->
+    <script connection-id="outfile">
+      <![CDATA[
+        <shipment>
+        <id>$ship_id</id>
+        <weight>$tot_wght</weight>
+        <pieces>$no_pce</pieces>
+        </shipment>]]>
+    </script>
+  </query>
+    
+</etl>
