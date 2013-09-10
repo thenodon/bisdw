@@ -4,7 +4,7 @@
     filedepo=/tmp/shipment/
   </properties>
 
-  <description>Express Shipment Sweden</description>
+  <description>Example</description>
 
   <connection id="mydb" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost/bisdwtest" user="testdb" password="testdb" />
 
