@@ -60,7 +60,7 @@ import org.quartz.impl.matchers.GroupMatcher;
 
 public class Execute implements ExecuteMBean {
 
-	static Logger  logger = Logger.getLogger(Execute.class);
+	static final Logger LOGGER = Logger.getLogger(Execute.class);
 	static Object syncObj = new Object();
 	//static Thread thisThread = Thread.currentThread();
 	private boolean shutdownRequested = false;
@@ -77,9 +77,9 @@ public class Execute implements ExecuteMBean {
 		try {
 			mbeanname = new ObjectName(BEANNAME);
 		} catch (MalformedObjectNameException e) {
-			logger.error("MBean object name failed, " + e);
+			LOGGER.error("MBean object name failed, " + e);
 		} catch (NullPointerException e) {
-			logger.error("MBean object name failed, " + e);
+			LOGGER.error("MBean object name failed, " + e);
 		}
 
 		try {
@@ -153,7 +153,7 @@ public class Execute implements ExecuteMBean {
 		
 		addDaemonShutdownHook();
 		if (ConfigurationManager.getInstance().getPidFile().exists()) {
-			logger.fatal("Pid file already exist - check if bischeck" + 
+			LOGGER.fatal("Pid file already exist - check if bischeck" + 
 			" already running");
 			return 1;
 		}
@@ -166,42 +166,42 @@ public class Execute implements ExecuteMBean {
 		System.err.close();
 
 		/* Enter loop if daemonMode */
-		logger.info("******************** Startup *******************");
+		LOGGER.info("******************** Startup *******************");
 
 		
 		Scheduler sched = null;		
 		try {
-			logger.info("Create scheduler");
+			LOGGER.info("Create scheduler");
 			sched = StdSchedulerFactory.getDefaultScheduler();
 		} catch (SchedulerException e1) {
-			logger.warn("Scheduler creation failed with exception " + e1);	
+			LOGGER.warn("Scheduler creation failed with exception " + e1);	
 			return 1;
 		}
 		
 		try {
-			logger.info("Start scheduler");
+			LOGGER.info("Start scheduler");
 			sched.start();
-			logger.info("Start scheduler - done");
+			LOGGER.info("Start scheduler - done");
 		} catch (SchedulerException e1) {
-			logger.warn("Scheduler failed to start with exception " + e1);
+			LOGGER.warn("Scheduler failed to start with exception " + e1);
 			return 1;
 		}
 		
 		
 		JobListener jobListener = new JobListenerLogger(); 
 		try {
-			logger.info("Add scheduler listener");
+			LOGGER.info("Add scheduler listener");
 			sched.getListenerManager().addJobListener(jobListener, allJobs());
-			logger.info("Add scheduler listener - done");
+			LOGGER.info("Add scheduler listener - done");
 		} catch (SchedulerException e1) {
-			logger.warn("Add listener failed with exception "+ e1);
+			LOGGER.warn("Add listener failed with exception "+ e1);
 			return 1;
 		}
 		
 		List<ETLJobConfig> schedulejobs = ConfigurationManager.getInstance().getScheduleJobConfigs();
 		
 		for (ETLJobConfig jobentry: schedulejobs) {
-			logger.info("Configure job " + jobentry.getETLJob());
+			LOGGER.info("Configure job " + jobentry.getETLJob());
 			Map<String,Object> map = new HashMap<String, Object>();
 			map.put("etljob", jobentry.getETLJob());
 			JobDataMap jobmap = new JobDataMap(map);
@@ -217,9 +217,9 @@ public class Execute implements ExecuteMBean {
 			
 					
 					sched.scheduleJob(job, trigger);
-					logger.info("Adding trigger to job " + trigger.toString());
+					LOGGER.info("Adding trigger to job " + trigger.toString());
 				} catch (SchedulerException e) {
-					logger.warn("Scheduled job failed with exception " + e);
+					LOGGER.warn("Scheduled job failed with exception " + e);
 					return 1;
 				}
 			}
@@ -234,13 +234,13 @@ public class Execute implements ExecuteMBean {
 			} catch (InterruptedException ignore) {}
 		
 			// Show next fire time for all triggers
-			if (logger.getEffectiveLevel() == Level.DEBUG) {
+			if (LOGGER.getEffectiveLevel() == Level.DEBUG) {
 				String[] list = getTriggers();
-				logger.debug("****** Next fire time *********");
+				LOGGER.debug("****** Next fire time *********");
 				for (int i=0;i<list.length;i++) {
-					logger.debug(list[i]);
+					LOGGER.debug(list[i]);
 				}
-				logger.debug("*******************************");
+				LOGGER.debug("*******************************");
 				
 				} 
 		} while (!isShutdownRequested()); 
@@ -249,10 +249,10 @@ public class Execute implements ExecuteMBean {
 		try {
 			sched.shutdown();
 		} catch (SchedulerException e) {
-			logger.warn("Stopping Quartz scheduler failed with - " + e);
+			LOGGER.warn("Stopping Quartz scheduler failed with - " + e);
 		}
 		
-		logger.info("******************* Shutdown ********************");
+		LOGGER.info("******************* Shutdown ********************");
 		LogManager.shutdown();
 		
 		return 0;
@@ -279,7 +279,7 @@ public class Execute implements ExecuteMBean {
 	
 	@Override
 	public void shutdown() {
-		logger.info("Shutdown request");
+		LOGGER.info("Shutdown request");
 		shutdownRequested = true;
 		try
 		{
@@ -289,7 +289,7 @@ public class Execute implements ExecuteMBean {
 			Thread.sleep(3000);
 		}
 		catch(InterruptedException e) {
-			logger.error("Interrupted which waiting on main daemon thread to complete.");
+			LOGGER.error("Interrupted which waiting on main daemon thread to complete.");
 		}
 	}
 
@@ -318,7 +318,7 @@ public class Execute implements ExecuteMBean {
 		
 		}
 		catch (SchedulerException se) {
-			logger.error("Build trigger list failed, " + se);
+			LOGGER.error("Build trigger list failed, " + se);
 		}
 		
 		String[] arr = new String[triggerList.size()];
