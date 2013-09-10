@@ -96,7 +96,7 @@ public class ConfigurationManager {
 
 	}
 
-	static Logger  logger = Logger.getLogger(ConfigurationManager.class);
+	static final Logger  LOGGER = Logger.getLogger(ConfigurationManager.class);
 
 	private static ConfigurationManager configMgr = null;
 	private Map<String,Object> cache = new HashMap<String,Object>();	
@@ -219,7 +219,7 @@ public class ConfigurationManager {
 					prop.put(xmlproperty.getKey(), xmlproperty.getValue());
 				}
 				etl.setProperties(prop);	
-				
+								
 				etljob.addETL(etl);	
 			}
 
@@ -262,7 +262,7 @@ public class ConfigurationManager {
 				.withSchedule(cronSchedule(schedule))
 				.build();
 			} catch (ParseException e) {
-				logger.error("Tigger parse error for dbcopy " + dbcopy.getName() + 
+				LOGGER.error("Tigger parse error for dbcopy " + dbcopy.getName() + 
 						" for schedule " + schedule);
 				throw new Exception(e.getMessage());
 			}
@@ -275,7 +275,7 @@ public class ConfigurationManager {
 				.withSchedule(simpleSchedule().repeatSecondlyForever(calculateInterval(schedule)))
 				.build();
 			} catch (Exception e) {
-				logger.error("Tigger parse error for dbcopy " + dbcopy.getName() + 
+				LOGGER.error("Tigger parse error for dbcopy " + dbcopy.getName() + 
 						" for schedule " + schedule);
 				throw new Exception(e.getMessage());
 			}
@@ -301,7 +301,7 @@ public class ConfigurationManager {
 			String withoutSpace=schedule.replaceAll(" ","");
 			char time = withoutSpace.charAt(withoutSpace.length()-1);
 			String value = withoutSpace.substring(0, withoutSpace.length()-1);
-			logger.debug("Time selected "+ time + " : " + value);
+			LOGGER.debug("Time selected "+ time + " : " + value);
 			switch (time) {
 			case 'S' : return (Integer.parseInt(value)); 
 			case 'M' : return (Integer.parseInt(value)*60); 
@@ -326,7 +326,7 @@ public class ConfigurationManager {
 			path=System.getProperty("bisdw");
 		else {
 
-			logger.warn("System property bisdw must be set");
+			LOGGER.warn("System property bisdw must be set");
 			throw new Exception("System property bisdw must be set");
 		}
 
@@ -340,7 +340,7 @@ public class ConfigurationManager {
 		if (configDir.isDirectory() && configDir.canRead()) 
 			return configDir;    
 		else {
-			logger.warn("Configuration directory " + configDir.getPath() + " does not exist or is not readable.");
+			LOGGER.warn("Configuration directory " + configDir.getPath() + " does not exist or is not readable.");
 			throw new Exception("Configuration directory " + configDir.getPath() + " does not exist or is not readable.");
 		}
 	}
@@ -405,7 +405,7 @@ public class ConfigurationManager {
 			try {
 				jc = JAXBContext.newInstance(instanceName);
 			} catch (JAXBException e) {
-				logger.error("Could not get JAXB context from class");
+				LOGGER.error("Could not get JAXB context from class");
 				throw new Exception(e.getMessage());
 			}
 			SchemaFactory sf = SchemaFactory.newInstance(
@@ -416,7 +416,7 @@ public class ConfigurationManager {
 
 				//schema = sf.newSchema(new File(initConfigDir(),"xsd"+File.separatorChar+xsdName));
 			} catch (SAXException e) {
-				logger.error("Could not vaildate xml file " + xmlName + " with xsd file " +
+				LOGGER.error("Could not vaildate xml file " + xmlName + " with xsd file " +
 						xsdName + ":" + e.getMessage());
 				throw new Exception(e.getMessage());
 			}
@@ -425,7 +425,7 @@ public class ConfigurationManager {
 			try {
 				u = jc.createUnmarshaller();
 			} catch (JAXBException e) {
-				logger.error("Could not create an unmarshaller for for context");
+				LOGGER.error("Could not create an unmarshaller for for context");
 				throw new Exception(e);
 			}
 			u.setSchema(schema);
@@ -433,11 +433,11 @@ public class ConfigurationManager {
 			try {
 				xmlobj =  u.unmarshal(configfile);
 			} catch (JAXBException e) {
-				logger.error("Could not unmarshall the file " + xmlName +":" + e);
+				LOGGER.error("Could not unmarshall the file " + xmlName +":" + e);
 				throw new Exception(e);
 			}
 			cache.put(xmlName, xmlobj);
-			logger.debug("Create new object for xml file " + xmlName + " and store in cache");
+			LOGGER.debug("Create new object for xml file " + xmlName + " and store in cache");
 		}
 		return xmlobj;
 	}
@@ -456,7 +456,7 @@ public class ConfigurationManager {
 					throw new Exception("Can not write to pid file " + configMgr.getPidFile());
 				}
 			} catch (Exception e) {
-				logger.error("Configuration Manager initzialization failed with " + e);
+				LOGGER.error("Configuration Manager initzialization failed with " + e);
 				throw e;
 			}
 		}
