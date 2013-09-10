@@ -12,4 +12,5 @@ public interface ETLInf {
 	public void setProperties(Properties properties);
 	public Properties getProperties();
 	public void runETL() throws Exception;
+	
 }
