@@ -8,7 +8,7 @@
 
   <connection id="mydb" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost/bisdwtest" user="testdb" password="testdb" />
 
-  <connection id="outfile" driver="text" url="$filedepo/shipment_${etl.date.today('yyyyMMdd-HH-mm-ss')}.sxml" />
+  <connection id="outfile" driver="text" url="$filedepo/shipment_${etl.date.today('yyyyMMdd-HH-mm-ss')}.xml" />
 
   <script connection-id="mydb">
     CREATE TABLE IF NOT EXISTS shipment(ship_id int, no_pce int, tot_wght decimal(16,1) UNSIGNED NOT NULL) ;
