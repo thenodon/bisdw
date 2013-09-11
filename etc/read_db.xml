@@ -13,7 +13,11 @@
   <script connection-id="mydb">
     CREATE TABLE IF NOT EXISTS shipment(ship_id int, no_pce int, tot_wght decimal(16,1) UNSIGNED NOT NULL) ;
   </script>
-
+  
+  <script connection-id="outfile"> <!--Writing header -->
+    &lt;shipments&gt;
+  </script>
+  
   <query connection-id="mydb">
     <!-- Select all shipments with pckp_dt TODAY and inbnd_ind = O from shipmentdb-->
     SELECT ship_id, no_pce, tot_wght FROM shipment;
@@ -28,5 +32,9 @@
         </shipment>]]>
     </script>
   </query>
+  
+  <script connection-id="outfile"> <!--Writing footer -->
+    &lt;/shipments&gt;
+  </script>
     
 </etl>
