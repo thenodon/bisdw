@@ -20,7 +20,11 @@ import scriptella.execution.EtlExecutorException;
 import scriptella.execution.ExecutionStatistics;
 
 
-
+/**
+ * The class execute the Scriptella script according to the specification in the
+ * bisdw.xml file. The Scriptella file is re-read every time the job is 
+ * executed. This means that a new EtlExecutor is created at each schedule.
+ */
 public class ETLScriptella implements ETLInf {
 	static final Logger LOGGER = Logger.getLogger(ETLJobExecute.class);
 	private String name = null;
