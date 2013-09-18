@@ -88,7 +88,7 @@ public class ETLScriptella implements ETLInf {
 			for (ExecutionStatistics.ElementInfo info : infoColl) {
 				StringBuffer strbuf = new StringBuffer();
 				strbuf.append("{");
-				strbuf.append("\"id\":\"").append(info.getId()).append("\" , ");
+				strbuf.append("\"id\":\"").append(this.name).append(info.getId()).append("\" , ");
 				strbuf.append("\"worktime_ms:\"").append((info.getWorkingTime()/1000000)).append("\" , ");
 				strbuf.append("\"statement_count:\"").append(info.getStatementsCount()).append("\" , ");
 				strbuf.append("\"success_count:\"").append(info.getSuccessfulExecutionCount()).append("\" , ");
