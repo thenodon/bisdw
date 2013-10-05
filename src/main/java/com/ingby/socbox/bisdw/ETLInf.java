@@ -13,7 +13,7 @@ public interface ETLInf {
 	 * The job that the specific etl config belongs to. 
 	 * @param dbcopy the job 
 	 */
-	public void setETLJob(ETLJob dbcopy);
+	//public void setETLJob(ETLJob dbcopy);
 	
 	
 	/**
@@ -63,6 +63,6 @@ public interface ETLInf {
 	 * Execute the etlprovider
 	 * @throws Exception
 	 */
-	public void runETL() throws Exception;
+	public void runETL() throws ETLRunException;
 	
 }

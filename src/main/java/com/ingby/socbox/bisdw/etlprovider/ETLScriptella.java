@@ -11,6 +11,8 @@ import com.ingby.socbox.bisdw.ConfigurationManager;
 import com.ingby.socbox.bisdw.ETLInf;
 import com.ingby.socbox.bisdw.ETLJob;
 import com.ingby.socbox.bisdw.ETLJobExecute;
+import com.ingby.socbox.bisdw.ETLRunException;
+
 import com.yammer.metrics.Metrics;
 import com.yammer.metrics.core.Timer;
 import com.yammer.metrics.core.TimerContext;
@@ -31,18 +33,10 @@ public class ETLScriptella implements ETLInf {
 	private String desc;
 	private Properties properties;
 	
-	public ETLScriptella() {
-	}
-
-	@Override
-	public void setETLJob(ETLJob dbcopy) {
-		// TODO Auto-generated method stub
-	}
 
 	@Override
 	public void setDecscription(String desc) {
 		this.desc = desc;
-		
 	}
 
 	@Override
@@ -57,29 +51,50 @@ public class ETLScriptella implements ETLInf {
 
 	@Override
 	public String getDecscription() {
-		return desc;
+		return this.desc;
 	}
 	
 	
 
 	@Override
-	public void runETL() throws Exception {
+	public void runETL() throws ETLRunException {
 		final Timer timer = Metrics.newTimer(ETLScriptella.class, 
 				this.name, TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
 		final TimerContext context = timer.time();
 		
 		ExecutionStatistics stats = null;
-		EtlExecutor etlExec = EtlExecutor.newExecutor(new File(ConfigurationManager.getInstance().initConfigDir(),
-				properties.getProperty("configFile"))); 
+		EtlExecutor etlExec;
+		try {
+			etlExec = EtlExecutor.newExecutor(new File(ConfigurationManager.getInstance().initConfigDir(),
+					properties.getProperty("configFile")));
+		} catch (Exception e) {
+			throw new ETLRunException(e);	
+		} 
+		
 		etlExec.setJmxEnabled(true);
 
 		try {
 			stats = etlExec.execute();
 		} catch (EtlExecutorException e) {
 			LOGGER.error("Execution failed for script" + this.name,e);
-			throw new Exception(e);
+			throw new ETLRunException(e);
 		} finally {
 			long duration = context.stop()/1000000;
+			if (LOGGER.isInfoEnabled()) {
+				Collection<ExecutionStatistics.ElementInfo> infoColl = stats.getElements();
+				for (ExecutionStatistics.ElementInfo info : infoColl) {
+					StringBuffer strbuf = new StringBuffer();
+					strbuf.append("{");
+					strbuf.append("\"id\":\"").append(this.name).append(info.getId()).append("\" , ");
+					strbuf.append("\"worktime_ms:\"").append((info.getWorkingTime()/1000000)).append("\" , ");
+					strbuf.append("\"statement_count:\"").append(info.getStatementsCount()).append("\" , ");
+					strbuf.append("\"success_count:\"").append(info.getSuccessfulExecutionCount()).append("\" , ");
+					strbuf.append("\"failed_count:\"").append(info.getFailedExecutionCount()).append("\" , ");
+					strbuf.append("\"throughput:\"").append(info.getThroughput()).append("\" , ");
+					strbuf.append("}");
+					LOGGER.info(strbuf.toString());
+				}
+			}
 			
 			if (LOGGER.isInfoEnabled()) {
 				LOGGER.info(this.name +" total execution time: " + duration + " ms");
@@ -87,21 +102,6 @@ public class ETLScriptella implements ETLInf {
 		}
 		
 		
-		Collection<ExecutionStatistics.ElementInfo> infoColl = stats.getElements();
-		if (LOGGER.isInfoEnabled()) {
-			for (ExecutionStatistics.ElementInfo info : infoColl) {
-				StringBuffer strbuf = new StringBuffer();
-				strbuf.append("{");
-				strbuf.append("\"id\":\"").append(this.name).append(info.getId()).append("\" , ");
-				strbuf.append("\"worktime_ms:\"").append((info.getWorkingTime()/1000000)).append("\" , ");
-				strbuf.append("\"statement_count:\"").append(info.getStatementsCount()).append("\" , ");
-				strbuf.append("\"success_count:\"").append(info.getSuccessfulExecutionCount()).append("\" , ");
-				strbuf.append("\"failed_count:\"").append(info.getFailedExecutionCount()).append("\" , ");
-				strbuf.append("\"throughput:\"").append(info.getThroughput()).append("\" , ");
-				strbuf.append("}");
-				LOGGER.info(strbuf.toString());
-			}
-		}
 	}
 
 	@Override

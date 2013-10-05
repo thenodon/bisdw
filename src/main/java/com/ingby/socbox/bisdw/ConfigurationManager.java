@@ -209,7 +209,7 @@ public class ConfigurationManager {
 				
 				ETLInf etl = (ETLInf) Class.forName(etlconfig.getClazz()).newInstance();
 				
-				etl.setETLJob(etljob);
+				//etl.setETLJob(etljob);
 				etl.setDecscription(etlconfig.getDesc());
 				etl.setName(etlconfig.getName());
 				Properties prop = new Properties();
