@@ -27,7 +27,7 @@ import scriptella.execution.ExecutionStatistics;
  * executed. This means that a new EtlExecutor is created at each schedule.
  */
 public class ETLScriptella implements ETLInf {
-	static final Logger LOGGER = Logger.getLogger(ETLJobExecute.class);
+	static final Logger LOGGER = Logger.getLogger(ETLScriptella.class);
 	private String name = null;
 	private String desc;
 	private Properties properties;
