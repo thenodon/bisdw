@@ -81,14 +81,15 @@ public class FTPManager {
 		File[] listOfFiles = localFolder.listFiles(); 
 		int count = 0;
 		
-		for (count = 0; count < listOfFiles.length; count++) {
+		for (int i = 0; i < listOfFiles.length; i++) {
 
-			if (listOfFiles[count].isFile()) {
-				File file = listOfFiles[count];
+			if (listOfFiles[i].isFile()) {
+				File file = listOfFiles[i];
 				LOGGER.info(file.getAbsoluteFile() + " => ftp => (" + properties.getProperty("todir")+") "+ file.getName());
 				boolean sendStatus = false;
 				try {
 					sendStatus = ftp.storeFile(file.getName(), new FileInputStream(file.getAbsoluteFile()));
+					count++;
 				} catch (FileNotFoundException e) {
 					LOGGER.error("File " + file.getAbsoluteFile() + " was not found",e);
 					throw e;
@@ -124,7 +125,7 @@ public class FTPManager {
 			}
 		}
 		
-		LOGGER.info( (count - 1) + " files sent to " + ftp.getRemoteAddress().getHostAddress());
+		LOGGER.info(count + " files sent to " + ftp.getRemoteAddress().getHostAddress());
 	}
 
 	
