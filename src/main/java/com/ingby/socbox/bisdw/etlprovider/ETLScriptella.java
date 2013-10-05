@@ -9,7 +9,6 @@ import org.apache.log4j.Logger;
 
 import com.ingby.socbox.bisdw.ConfigurationManager;
 import com.ingby.socbox.bisdw.ETLInf;
-import com.ingby.socbox.bisdw.ETLJob;
 import com.ingby.socbox.bisdw.ETLJobExecute;
 import com.ingby.socbox.bisdw.ETLRunException;
 

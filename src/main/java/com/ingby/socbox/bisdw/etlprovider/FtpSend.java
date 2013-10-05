@@ -1,28 +1,14 @@
 package com.ingby.socbox.bisdw.etlprovider;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.SocketException;
-import java.nio.channels.FileChannel;
-import java.util.Collection;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.net.ftp.FTP;
-import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPClientConfig;
-import org.apache.commons.net.ftp.FTPReply;
+
 import org.apache.log4j.Logger;
 
-import scriptella.execution.EtlExecutorException;
-import scriptella.execution.ExecutionStatistics;
 
 import com.ingby.socbox.bisdw.ETLInf;
-import com.ingby.socbox.bisdw.ETLJob;
-import com.ingby.socbox.bisdw.ETLJobExecute;
 import com.ingby.socbox.bisdw.ETLRunException;
 import com.ingby.socbox.bisdw.FTPManager;
 import com.ingby.socbox.bisdw.FTPManagerException;
@@ -33,7 +19,6 @@ import com.yammer.metrics.core.TimerContext;
 public class FtpSend implements ETLInf {
 
 	static final Logger LOGGER = Logger.getLogger(FtpSend.class);
-	private static final String SAVEDIRECTORY = ".save";
 	private String name = null;
 	private String desc;
 	private Properties properties;
