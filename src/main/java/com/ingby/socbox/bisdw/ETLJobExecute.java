@@ -31,7 +31,7 @@ public class ETLJobExecute implements Job {
 			try {
 				
 				etl.runETL();
-			} catch (Exception e) {
+			} catch (ETLRunException e) {
 				LOGGER.error("ETL execution failed for etl " + etl.getName() + " with exception " + e);
 			}
 		}
