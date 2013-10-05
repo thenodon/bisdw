@@ -1,12 +1,18 @@
 package com.ingby.socbox.bisdw;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+
+import com.ingby.socbox.bisdw.etlprovider.FtpSend;
+import com.yammer.metrics.Metrics;
+import com.yammer.metrics.core.Timer;
+import com.yammer.metrics.core.TimerContext;
 
 public class ETLJobExecute implements Job {
 
@@ -24,7 +30,11 @@ public class ETLJobExecute implements Job {
 		etljob = (ETLJob) dataMap.get("etljob");
 		
 		LOGGER.debug("Executing Service: " + etljob.getName());
-        					
+	
+		final Timer timer = Metrics.newTimer(ETLJobExecute.class, 
+				etljob.getName(), TimeUnit.MILLISECONDS, TimeUnit.SECONDS);
+		final TimerContext timerCtx = timer.time();
+						
 		// Open the connection specific for the service
 		for (Map.Entry<String, ETLInf> etlentry: etljob.getETLs().entrySet()){
 			ETLInf etl = etlentry.getValue();
@@ -35,6 +45,13 @@ public class ETLJobExecute implements Job {
 				LOGGER.error("ETL execution failed for etl " + etl.getName() + " with exception " + e);
 			}
 		}
+		
+		long duration = timerCtx.stop()/1000000;
+		
+		if (LOGGER.isInfoEnabled()) {
+			LOGGER.info(etljob.getName() +" total execution time: " + duration + " ms");
+		}
+		
 	}
 	
 }
