@@ -132,8 +132,11 @@ Introduction
 \begin_layout Standard
 Bisdw is a simple ETL tool that is target to extract data from different
  source.
- It can use different embedded ways to do the extraction but currently only
- 
+ It can use different embedded ways to do the extraction from different
+ kind of databases, files, etc.
+ In addition Bisdw support FTP based transfer of the result of the extraction
+ process.
+ Bisdw use the open source project 
 \begin_inset CommandInset href
 LatexCommand href
 name "Scriptella"
@@ -141,10 +144,14 @@ target "http://scriptella.javaforge.com/"
 
 \end_inset
 
-is supported.
- Bisdw runs as a daemon process.
- By configuration Bisdw will run ETL jobs based on scheduling definition
- that are defined for each job.
+to enable ETL functionality, but can be extended in a simple way.
+ 
+\end_layout
+
+\begin_layout Standard
+Bisdw runs as a daemon process.
+ By configuration Bisdw will run different ETL jobs based on scheduling
+ definition that are defined for each job.
  
 \end_layout
 
@@ -274,23 +281,29 @@ Location="../src/main/resources/bisdw.xsd">
 
 \begin_layout Standard
 Each <etljob> can include one to many <etlconfig>.
- All etlconfig's will be executed according to the cron expression in the
- <scheduler> tag, but in the order specified in the order tag.
- The etlconfig will be executed in the order of the lowest order first.
+ A <etljob> will execute all etlconfig's part of the job according to the
+ cron expression in the <schedule> tag, but in the sequence order specified
+ in the >order> tag.
+ The etlconfig's will be executed in the order of the lowest order first.
  This is important if there is a data dependencies between the different
  etlconfig's.
- By using order a sequence of execution can be specified.
+ By using the order tag a sequence of execution is quarantined.
 \end_layout
 
 \begin_layout Standard
 Each etlconfig has a class specification that define the java class to be
  executed by the etljob.
- A list of properties can be specified that will be used by the specified
+ A list of properties can be specified that is specific by the specified
  class.
 \end_layout
 
 \begin_layout Subsection
 Scheduling
+\end_layout
+
+\begin_layout Standard
+Each etljob can have multiple schedule tags, but at least one.
+ The scheduling can have two different formats, interval or cron based.
 \end_layout
 
 \begin_layout Subsubsection
@@ -384,6 +397,10 @@ status open
 \end_layout
 
 \begin_layout Section
+Etlconfig configuration
+\end_layout
+
+\begin_layout Subsection
 \begin_inset CommandInset label
 LatexCommand label
 name "label:ETLScriptella_configuration"
@@ -395,8 +412,11 @@ ETLScriptella configuration
 
 \begin_layout Standard
 The ETLScriptella takes one property from the etlconfig definition in bisdw.xml.
- The property is the configFile and specify the scriptella script file to
- read and execute.
+ The property is the 
+\emph on
+configFile
+\emph default
+ and specify the scriptella script file to read and execute.
  For more information about Scriptella configuration please visit 
 \begin_inset CommandInset href
 LatexCommand href
@@ -408,13 +428,102 @@ target "http://scriptella.javaforge.com/reference/index.html"
  
 \end_layout
 
-\begin_layout Section
-FtpSend configuration
+\begin_layout Subsection
+FTPSend configuration
 \end_layout
 
 \begin_layout Standard
-The FtpSend class enable transfer over FTP to a remote server.
- This can typical be used as part of the 
+The FTPSend class enable transfer over FTP to a remote server.
+ This can typical be used as part of the of a etljob where files are created
+ by a scriptella script that is after creation is transfered to a FTP server.
+\end_layout
+
+\begin_layout Standard
+The FTPSend configuration takes a number of properties to control the connection.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+hostname
+\emph default
+ - the name or IP of the ftp server to connect to.
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+port
+\emph default
+ - the socket port used by the ftp server, default is 21.
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+timeout
+\emph default
+ - connection timeout, default is 2000 ms.
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+username
+\emph default
+ - username for the ftp server.
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+password
+\emph default
+ - password for the username
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+transferMode
+\emph default
+ - ascii or binary, default is ascii
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+connectionMode
+\emph default
+ - active or passive, default is passive.
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+remoteDir
+\emph default
+ - the directory on ftp server side, default is the current directory after
+ login.
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+localDir
+\emph default
+ - the directory on the local side.
+\end_layout
+
+\begin_layout Itemize
+
+\emph on
+moveFileAfterSend
+\emph default
+ - move the files after transfer to the directory .save in the localDir default
+ is true.
+ If set to false the file is just deleted after successful transfer.
 \end_layout
 
 \begin_layout Section
@@ -428,8 +537,7 @@ properties.xml
 \end_layout
 
 \begin_layout Standard
-The properties.xml include properties used by the core of Bischeck, but can
- also be used by custom developed services and threshold classes.
+The properties.xml include properties used by the core of Bisdw.
  The properties xml has a simple structure of key/value pair: 
 \end_layout
 
@@ -475,8 +583,7 @@ status open
 \end_layout
 
 \begin_layout Standard
-Any properties should have a default value that is set in code.
- The following properties are currently used by core Bisdw:
+The following properties are currently used by core Bisdw:
 \end_layout
 
 \begin_layout Itemize
@@ -520,8 +627,8 @@ nk bisdw
 \end_layout
 
 \begin_layout Standard
-To build a Bischeck distribution run from the directory where you checked
- out the Bischeck code: 
+To build a Bisdw distribution run from the directory where you checked out
+ the Bisdw code: 
 \end_layout
 
 \begin_layout Standard
@@ -591,7 +698,7 @@ Developing with Bisdw
 \end_layout
 
 \begin_layout Standard
-Its simple to develop your own ETL implementation.
+Its simple to develop your own ETL config implementation.
  To develop your own you must follow the interface ETLInf.
 \end_layout
 
@@ -815,7 +922,7 @@ status open
 
 \begin_layout Plain Layout
 
-$ sudo /etc/init.d/bischeckd start
+$ sudo /etc/init.d/bisdwd start
 \end_layout
 
 \end_inset
@@ -835,7 +942,7 @@ status open
 
 \begin_layout Plain Layout
 
-# service bischeckd start
+# service bisdwd start
 \end_layout
 
 \end_inset
@@ -847,28 +954,6 @@ status open
 For testing purpose it can be good to just run Bisdw once and make sure
  that every thing is executing as expected.
  This is done by executing:
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
-inline false
-status open
-
-\begin_layout Plain Layout
-
-$ bischeck Execute
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-This will override all scheduling definitions and execute everything directly,
- but only once.
- 
 \end_layout
 
 \begin_layout Standard
@@ -894,36 +979,6 @@ $ bischeck ConfigurationManager -p
 \begin_layout Standard
 This command is used in the init script bischeckd to retrieve the current
  pid.
-\end_layout
-
-\begin_layout Section
-List Bischeck configuration
-\end_layout
-
-\begin_layout Standard
-Formatted listing of all configuration files is managed by the DocManager
- class.
- 
-\end_layout
-
-\begin_layout Standard
-To generate the configuration files in html format:
-\end_layout
-
-\begin_layout Standard
-\begin_inset listings
-lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
-inline false
-status open
-
-\begin_layout Plain Layout
-
-$ bisdw ConfigurationManager -l
-\end_layout
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Section
@@ -1022,6 +1077,37 @@ http://www.apache.org/licenses/LICENSE-2.0.html
 \end_inset
 
  
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+commons-net-3.3.jar 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://commons.apache.org/proper/commons-jexl/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \end_deeper
@@ -1198,7 +1284,7 @@ http://commons.apache.org/cli/
 \begin_deeper
 \begin_layout Itemize
 \begin_inset Flex URL
-status collapsed
+status open
 
 \begin_layout Plain Layout
 
@@ -1214,7 +1300,7 @@ http://www.apache.org/licenses/LICENSE-2.0.html
 \begin_layout Itemize
 slf4j-api-1.6.0.jar - 
 \begin_inset Flex URL
-status collapsed
+status open
 
 \begin_layout Plain Layout
 
@@ -1229,7 +1315,7 @@ http://www.slf4j.org/
 \begin_deeper
 \begin_layout Itemize
 \begin_inset Flex URL
-status collapsed
+status open
 
 \begin_layout Plain Layout
 
@@ -1245,7 +1331,7 @@ http://www.opensource.org/licenses/mit-license.php
 \begin_layout Itemize
 slf4j-log4j12-1.6.0.jar - 
 \begin_inset Flex URL
-status collapsed
+status open
 
 \begin_layout Plain Layout
 
@@ -1260,7 +1346,7 @@ http://www.slf4j.org/
 \begin_deeper
 \begin_layout Itemize
 \begin_inset Flex URL
-status collapsed
+status open
 
 \begin_layout Plain Layout
 
@@ -1305,7 +1391,7 @@ http://www.apache.org/licenses/LICENSE-2.0.html
 
 \end_deeper
 \begin_layout Standard
-All files are distributed as part of Bischeck are located in the lib directory.
+All files are distributed as part of Bisdw are located in the lib directory.
  
 \end_layout
 
