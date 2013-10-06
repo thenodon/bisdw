@@ -1,0 +1,1373 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass scrbook
+\begin_preamble
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhead{}
+\fancyfoot{}
+\fancyfoot[C]{\thepage}
+%\fancyhead[LE,RO]{\slshape bischeck Readme}
+\fancyhead[LE,RO]{bischeck - A business activity check command server for Nagios}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+%\lhead{bischeck}
+%\rhead{Text you want on the right top}
+%\chead{Text you want over the center}
+%\lfoot{left footer}
+%\rfoot{right footer}
+%\cfoot{\thepage}
+
+% \lhead{\nouppercase{\rightmark} (\nouppercase{\leftmark})}
+% \lhead{\nouppercase{\leftmark}}  
+% \chead{}
+%   \rhead{}
+%   \lfoot{2011}
+%   \cfoot{bischeck}
+%   \rfoot{\thepage}
+%   \renewcommand{\headrulewidth}{0.4pt}
+%   \renewcommand{\footrulewidth}{0.4pt}
+
+%  \renewcommand{\chaptermark}[1]{%
+ % \markboth{#1}{}}
+\end_preamble
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry false
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
+\cite_engine basic
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle fancy
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+bisdw 
+\begin_inset Newline newline
+\end_inset
+
+-
+\begin_inset Newline newline
+\end_inset
+
+Bisdw -a simple ETL tool 
+\end_layout
+
+\begin_layout Date
+Version 0.2.0 
+\begin_inset Newline newline
+\end_inset
+
+2013-09-17
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset toc
+LatexCommand tableofcontents
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Introduction"
+
+\end_inset
+
+Introduction 
+\end_layout
+
+\begin_layout Standard
+Bisdw is a simple ETL tool that is target to extract data from different
+ source.
+ It can use different embedded ways to do the extraction but currently only
+ 
+\begin_inset CommandInset href
+LatexCommand href
+name "Scriptella"
+target "http://scriptella.javaforge.com/"
+
+\end_inset
+
+is supported.
+ Bisdw runs as a daemon process.
+ By configuration Bisdw will run ETL jobs based on scheduling definition
+ that are defined for each job.
+ 
+\end_layout
+
+\begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Configuration"
+
+\end_inset
+
+Configuration 
+\end_layout
+
+\begin_layout Standard
+The main configuration file is the bidw.xml.
+ Additional common properties are set in the properties.xml fle.
+\end_layout
+
+\begin_layout Section
+bisdw.xml configuration
+\end_layout
+
+\begin_layout Standard
+Bisdw is configured by defining ETLs jobs in the in the bisdw.xml file.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=XML,numbers=right,tabsize=2"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<?xml version="1.0" encoding="UTF-8"?> 
+\end_layout
+
+\begin_layout Plain Layout
+
+<bisdw xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchema
+Location="../src/main/resources/bisdw.xsd">
+\end_layout
+
+\begin_layout Plain Layout
+
+  <etljob> 		
+\end_layout
+
+\begin_layout Plain Layout
+
+    <name>read_DB</name>
+\end_layout
+
+\begin_layout Plain Layout
+
+    <desc>Database</desc>
+\end_layout
+
+\begin_layout Plain Layout
+
+    <schedule>0 */1 * * * ?</schedule>
+\end_layout
+
+\begin_layout Plain Layout
+
+    <etlconfig name="read_db">
+\end_layout
+
+\begin_layout Plain Layout
+
+      <desc>read db</desc>
+\end_layout
+
+\begin_layout Plain Layout
+
+	    <class>com.ingby.socbox.bisdw.etlprovider.ETLScriptella</class>
+\end_layout
+
+\begin_layout Plain Layout
+
+	    <order>10</order>
+\end_layout
+
+\begin_layout Plain Layout
+
+	    <property>
+\end_layout
+
+\begin_layout Plain Layout
+
+	      <key>configFile</key>
+\end_layout
+
+\begin_layout Plain Layout
+
+		  <value>read_db.xml</value>
+\end_layout
+
+\begin_layout Plain Layout
+
+	    </property>
+\end_layout
+
+\begin_layout Plain Layout
+
+    </etlconfig>
+\end_layout
+
+\begin_layout Plain Layout
+
+  </etljob>
+\end_layout
+
+\begin_layout Plain Layout
+
+</bisdw>
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Each <etljob> can include one to many <etlconfig>.
+ All etlconfig's will be executed according to the cron expression in the
+ <scheduler> tag, but in the order specified in the order tag.
+ The etlconfig will be executed in the order of the lowest order first.
+ This is important if there is a data dependencies between the different
+ etlconfig's.
+ By using order a sequence of execution can be specified.
+\end_layout
+
+\begin_layout Standard
+Each etlconfig has a class specification that define the java class to be
+ executed by the etljob.
+ A list of properties can be specified that will be used by the specified
+ class.
+\end_layout
+
+\begin_layout Subsection
+Scheduling
+\end_layout
+
+\begin_layout Subsubsection
+Interval scheduling
+\end_layout
+
+\begin_layout Standard
+The simple format describe a interval execution that are repeated forever.
+ The format is just a number and a indicator defining the granularity in
+ seconds (S), minutes (M) or hours (H).
+ 10M specify that the service should be executed every ten minutes.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=XML,numbers=right,tabsize=2"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<schedule>10M</schedule>		
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsubsection
+Cron based scheduling
+\end_layout
+
+\begin_layout Standard
+The second format is more advanced and follow the cron specification of
+ Quartz, see 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.quartz-scheduler.org
+\end_layout
+
+\end_inset
+
+.
+ With this format its possible to define scheduling expression like 
+\emph on
+
+\begin_inset Quotes eld
+\end_inset
+
+0 15 10 ? * MON-FRI
+\begin_inset Quotes erd
+\end_inset
+
+
+\emph default
+ which would schedule the service at 10:15am every Monday, Tuesday, Wednesday,
+ Thursday and Friday.
+ For more cron examples please visit 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.quartz-scheduler.org/documentation/quartz-2.1.x/tutorials/crontrigger
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=XML,numbers=right,tabsize=2"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<schedule>0 15 10 ? * MON-FRI</schedule>		
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "label:ETLScriptella_configuration"
+
+\end_inset
+
+ETLScriptella configuration
+\end_layout
+
+\begin_layout Standard
+The ETLScriptella takes one property from the etlconfig definition in bisdw.xml.
+ The property is the configFile and specify the scriptella script file to
+ read and execute.
+ For more information about Scriptella configuration please visit 
+\begin_inset CommandInset href
+LatexCommand href
+name "Scriptella documentation"
+target "http://scriptella.javaforge.com/reference/index.html"
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_layout Section
+FtpSend configuration
+\end_layout
+
+\begin_layout Standard
+The FtpSend class enable transfer over FTP to a remote server.
+ This can typical be used as part of the 
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "label:properties.xml"
+
+\end_inset
+
+properties.xml
+\end_layout
+
+\begin_layout Standard
+The properties.xml include properties used by the core of Bischeck, but can
+ also be used by custom developed services and threshold classes.
+ The properties xml has a simple structure of key/value pair: 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=XML,numbers=right,tabsize=2"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<properties>
+\end_layout
+
+\begin_layout Plain Layout
+
+	<property> 
+\end_layout
+
+\begin_layout Plain Layout
+
+		<key>akey</key> 
+\end_layout
+
+\begin_layout Plain Layout
+
+		<value>avalue</value>   
+\end_layout
+
+\begin_layout Plain Layout
+
+	</property>
+\end_layout
+
+\begin_layout Plain Layout
+
+</properties>
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Any properties should have a default value that is set in code.
+ The following properties are currently used by core Bisdw:
+\end_layout
+
+\begin_layout Itemize
+pidfile - the pid file for Bischeck, default is "
+\emph on
+/var/tmp/bisdw.pid
+\emph default
+".
+\end_layout
+
+\begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Building-bischeck"
+
+\end_inset
+
+Building Bisdw
+\end_layout
+
+\begin_layout Standard
+To build Bisdw from source is simple.
+ Check out the Bisdw trunk from gforge.ingby.com: 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ svn checkout --username anonymous http://gforge.ingby.com/svn/bischeck/bisdw/tru
+nk bisdw
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To build a Bischeck distribution run from the directory where you checked
+ out the Bischeck code: 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ ant dist
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This will create a compressed tar file in the 
+\shape italic
+target
+\shape default
+ directory, named bisdw-x.y.z.tgz where x.y.z is the version number.
+ Different versions of Bisdw can be checked out from the tags directory
+ located in 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://gforge.ingby.com/svn/bischeck/bisdw/tags
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Jar-customization"
+
+\end_inset
+
+Jar customization
+\end_layout
+
+\begin_layout Standard
+To support custom jar files please place them in the directory 
+\emph on
+customlib
+\emph default
+.
+ This would typical be jdbc drivers, etc.
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Developing-with-bisdw"
+
+\end_inset
+
+Developing with Bisdw
+\end_layout
+
+\begin_layout Standard
+Its simple to develop your own ETL implementation.
+ To develop your own you must follow the interface ETLInf.
+\end_layout
+
+\begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Installation"
+
+\end_inset
+
+Installation 
+\end_layout
+
+\begin_layout Standard
+The latest binary version of Bisdw is available on 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://gforge.ingby.com/gf/project/bischeck/frs/
+\end_layout
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+Download the distribution file and follow the steps below to install.
+ Make sure you have root privileges doing this.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+# tar xzvf bisdw-x.y.z.tgz 
+\end_layout
+
+\begin_layout Plain Layout
+
+# cd bisdw-x.y.z
+\end_layout
+
+\begin_layout Plain Layout
+
+# chmod 755 install 
+\end_layout
+
+\begin_layout Plain Layout
+
+# ./install -u #Get usage
+\end_layout
+
+\begin_layout Plain Layout
+
+# ./install    #Install default
+\end_layout
+
+\begin_layout Plain Layout
+
+# service bisdw start    #Redhat/Centos
+\end_layout
+
+\begin_layout Plain Layout
+
+# /etc/init.d/bischeck start #Debian/Ubuntu
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+To get full list of available options to the install script use -u.
+ By default the 
+\emph on
+install
+\emph default
+ script will install Bisdw in directory 
+\emph on
+/opt/socbox/addons/bis
+\emph default
+dw, referred to as 
+\emph on
+$BISDW
+\emph default
+ and with the ownership of the user id 
+\emph on
+bisdw
+\emph default
+.
+ Make sure that the user exist before running install.
+\end_layout
+
+\begin_layout Standard
+The last commands start the bisdw daemon with the effective user id of the
+ user id set during install, default user 
+\emph on
+bisdw
+\emph default
+.
+ The installation will configure 
+\emph on
+bisdwd
+\emph default
+ to start automatically in run level 3, 4 and 5.
+\end_layout
+
+\begin_layout Standard
+The process id of the java process running bisdw in daemon mode is located
+ in a file, default in 
+\emph on
+/var/tmp/bisdw.pid
+\emph default
+.
+ This file is used by the 
+\emph on
+bisdwd
+\emph default
+ script to stop the java program running Bisdw and make sure that only one
+ instance of Bisdw is started on the server.
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Getting-started"
+
+\end_inset
+
+Getting started
+\end_layout
+
+\begin_layout Standard
+In the 
+\emph on
+$BISDW/etc
+\emph default
+ directory there are examples of all the configuration files.
+ 
+\end_layout
+
+\begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Logging"
+
+\end_inset
+
+Logging
+\end_layout
+
+\begin_layout Standard
+Bisdw use log4j for log management.
+ The log4j configuration is described in the log4.properties file located
+ in the 
+\emph on
+resources
+\emph default
+ directory of the Bisdw installation.
+ By default Bisdw writes log information at level INFO to file 
+\emph on
+/var/tmp/bischeck.log
+\emph default
+.
+ 
+\end_layout
+
+\begin_layout Chapter
+Run Bisdw from the command line
+\end_layout
+
+\begin_layout Standard
+The normal way to run Bisdw is as a daemon using the init.d script 
+\emph on
+bisdwd
+\emph default
+, but is also possible to start Bisdw in continues running mode by executing:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ bisdw Execute -d
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Running in this way have limitations since the execution will not automatically
+ be placed as a background process and the effective user id will be the
+ user starting the process which may not have all permissions according
+ to the installation.
+ Neither will pid files be updated correctly.
+ For production system always use the init.d script.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ sudo /etc/init.d/bischeckd start
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+or
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+# service bischeckd start
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+For testing purpose it can be good to just run Bisdw once and make sure
+ that every thing is executing as expected.
+ This is done by executing:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ bischeck Execute
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This will override all scheduling definitions and execute everything directly,
+ but only once.
+ 
+\end_layout
+
+\begin_layout Standard
+To show the pid file used for the Bischeck daemon running:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ bischeck ConfigurationManager -p
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This command is used in the init script bischeckd to retrieve the current
+ pid.
+\end_layout
+
+\begin_layout Section
+List Bischeck configuration
+\end_layout
+
+\begin_layout Standard
+Formatted listing of all configuration files is managed by the DocManager
+ class.
+ 
+\end_layout
+
+\begin_layout Standard
+To generate the configuration files in html format:
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ bisdw ConfigurationManager -l
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Validating configuration files
+\end_layout
+
+\begin_layout Standard
+To validate if the xml configuration files are correct the following command
+ will return 0 if correct.
+ Use $? to see return status.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=sh"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+$ bischeck ConfigurationManager -v; echo $?
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Releases"
+
+\end_inset
+
+Releases
+\end_layout
+
+\begin_layout Section
+Release 0.1.2 - 2013-09-17
+\end_layout
+
+\begin_layout Standard
+This is the first major version.
+\end_layout
+
+\begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "label:System-requirements"
+
+\end_inset
+
+System requirements
+\end_layout
+
+\begin_layout Standard
+Bisdw should run on any operating system that supports Java 6.
+ The installation script and init scripts are supported on Redhat and Debian
+ equivalent Linux distributions.
+ Running on none Linux operating system has not been tested.
+\end_layout
+
+\begin_layout Standard
+The following jar packages are distributed as part of the Bisdw distribution.
+ All these packages have their own open source licenses.
+ 
+\end_layout
+
+\begin_layout Itemize
+scriptella-core.jar, scriptella-drivers.jar, scriptella.jar and scriptella-tools.jar
+ version 1.1 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://scriptella.javaforge.com/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+commons-jexl.jar 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://commons.apache.org/proper/commons-jexl/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+commons-logging.jar 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://commons.apache.org/proper/commons-logging/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+metrics-core.jar - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+https://github.com/codahale/metrics
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+log4j-1.2.16.jar - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://logging.apache.org/log4j/
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+commons-lang-2.5.jar - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://commons.apache.org/lang/
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+commons-cli-1.2.jar - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://commons.apache.org/cli/
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+slf4j-api-1.6.0.jar - 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.slf4j.org/
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.opensource.org/licenses/mit-license.php
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+slf4j-log4j12-1.6.0.jar - 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.slf4j.org/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.opensource.org/licenses/mit-license.php
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_deeper
+\begin_layout Itemize
+quartz-2.2.1.jar - 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.quartz-scheduler.org/
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_deeper
+\begin_layout Itemize
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+http://www.apache.org/licenses/LICENSE-2.0.html
+\end_layout
+
+\end_inset
+
+ 
+\end_layout
+
+\end_deeper
+\begin_layout Standard
+All files are distributed as part of Bischeck are located in the lib directory.
+ 
+\end_layout
+
+\begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "label:bisdw-license"
+
+\end_inset
+
+Bisdw license 
+\end_layout
+
+\begin_layout Standard
+Bisdw is licensed under GNU license version 2.
+ For more info please visit 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://www.gnu.org/licenses/gpl-2.0.htm
+\end_layout
+
+\end_inset
+
+l
+\end_layout
+
+\begin_layout Chapter
+Bug reports and feature requests
+\end_layout
+
+\begin_layout Standard
+Please submit bug reports and feature requests on 
+\begin_inset Flex URL
+status open
+
+\begin_layout Plain Layout
+
+gforge.ingby.com
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Credits"
+
+\end_inset
+
+Credits
+\end_layout
+
+\begin_layout Standard
+Thanks to all people who has developed all the great software that Bisdw
+ depends on.
+\end_layout
+
+\end_body
+\end_document
