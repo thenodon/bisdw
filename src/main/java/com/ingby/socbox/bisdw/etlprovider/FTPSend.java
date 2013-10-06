@@ -71,10 +71,10 @@ public class FTPSend implements ETLInf {
             ftp.putAllDirectory();
             
 		} catch (IOException e) {
-			LOGGER.error("Execution failed for script" + this.name,e);
+			LOGGER.error("Execution failed for script " + this.name,e);
 			throw new ETLRunException(e);
 		} catch(FTPManagerException e) {
-			LOGGER.error("Execution failed for script" + this.name,e);
+			LOGGER.error("Execution failed for script " + this.name,e);
 			throw new ETLRunException(e);
 		}finally {
 			ftp.disconnect();
