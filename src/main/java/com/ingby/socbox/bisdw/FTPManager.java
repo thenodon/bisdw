@@ -17,27 +17,51 @@ import org.apache.log4j.Logger;
 
 public class FTPManager {
 
-	static final Logger LOGGER = Logger.getLogger(FTPManager.class);
+	private static final Logger LOGGER = Logger.getLogger(FTPManager.class);
 	private static final String SAVEDIRECTORY = ".save";
-	private Properties properties;
+
 	private FTPClient ftp;
-	private File localFolder;
+	
+	private String hostName;
+	private int port;
+	private int connectTimeout;
+	private String username;
+	private String password;
+	private String transferMode;
+	private String connectionMode;
+	
+	private Boolean moveFileAfterSend;
+	private String remoteDir;
+	private String localDir;
+	
+	private File localDirFile;
+	
 	
 	public FTPManager(Properties properties) {
 		ftp = new FTPClient();
-		this.properties = properties;
+		hostName          = properties.getProperty("hostname");
+		connectTimeout    = Integer.parseInt(properties.getProperty("timeout", "2000"));
+		port              = Integer.parseInt(properties.getProperty("port", "21"));
+		username          = properties.getProperty("username");
+		password          = properties.getProperty("password");
+		transferMode      = properties.getProperty("transferMode", "ascii");
+		connectionMode    = properties.getProperty("connectionMode","passive");
+		remoteDir         = properties.getProperty("todir");
+		localDir          = properties.getProperty("fromdir");
+		moveFileAfterSend = Boolean.valueOf(properties.getProperty("moveDir","true"));
 	}
+	
 	
 	public void init() throws FTPManagerException{
 		try {
 			connect();
 			login();
             transferMode();
-            setMode();
+            connectionMode();
             setRemoteDirectory();            
-            localFolder = setLocalDirectory();
+            localDirFile = setLocalDirectory();
             if(LOGGER.isInfoEnabled()) {
-        		LOGGER.info(localInfo().toString());
+        		LOGGER.info(ftpInfo().toString());
             }
 			
 		} catch (IOException e) {
@@ -61,31 +85,49 @@ public class FTPManager {
         }
 	}
 	
-	private StringBuffer localInfo() throws IOException {
+	
+	private StringBuffer ftpInfo() throws IOException {
 		StringBuffer strbuf = new StringBuffer();
 		strbuf.append("{");
 		strbuf.append("server:").append(ftp.getRemoteAddress().getHostAddress()).append(", ");
+		strbuf.append("connectionMode:").append(ftp.getDataConnectionMode()).append(", ");
+		strbuf.append("connectionModeSet:").append(connectionMode).append(", ");
+		strbuf.append("transferMode:").append(transferMode).append(", ");
 		strbuf.append("ctrlenc:").append(ftp.getControlEncoding()).append(", ");
 		strbuf.append("systemtype:").append(ftp.getSystemType()).append(", ");
-		strbuf.append("charset:").append(ftp.getCharset().name()).append(", ");
+		strbuf.append("charset:").append(ftp.getCharset().name());
 		strbuf.append("}");
 		return strbuf;
-		//LOGGER.info("Remote system is " + ftp.getRemoteAddress().getHostAddress());
-		//LOGGER.info(ftp.getStatus());
 	}
 
 	
 	public void putAllDirectory() throws IOException {
 		
 		int reply;
-		File[] listOfFiles = localFolder.listFiles(); 
+		File[] listOfFiles = localDirFile.listFiles(); 
 		int count = 0;
 		
 		for (int i = 0; i < listOfFiles.length; i++) {
 
 			if (listOfFiles[i].isFile()) {
 				File file = listOfFiles[i];
-				LOGGER.info(file.getAbsoluteFile() + " => ftp => (" + properties.getProperty("todir")+") "+ file.getName());
+				if (LOGGER.isInfoEnabled()) {
+					if (remoteDir == null) {
+						LOGGER.info(file.getAbsoluteFile() + 
+								" => " + 
+								ftp.getRemoteAddress().getHostAddress() + 
+								" => Dir: (default) File: "+ 
+								file.getName());
+					} else {
+						LOGGER.info(file.getAbsoluteFile() + 
+								" => " + 
+								ftp.getRemoteAddress().getHostAddress() + 
+								" => Dir: (" + 
+								remoteDir +") File: "+ 
+								file.getName());
+					}
+				}
+				
 				boolean sendStatus = false;
 				try {
 					sendStatus = ftp.storeFile(file.getName(), new FileInputStream(file.getAbsoluteFile()));
@@ -101,11 +143,11 @@ public class FTPManager {
 				if (!sendStatus) {
 					reply = ftp.getReplyCode();
 		            if(!FTPReply.isPositiveCompletion(reply)) {
-		            	LOGGER.info("Put error " + ftp.getReplyString());
+		            	LOGGER.error("Put error " + ftp.getReplyString());
 		            }
 				} else {
-					if (Boolean.valueOf(properties.getProperty("moveDir","true"))) {
-						File moveDir = new File(localFolder,SAVEDIRECTORY);
+					if (moveFileAfterSend) {
+						File moveDir = new File(localDir,SAVEDIRECTORY);
 
 						if (!moveDir.exists()) {
 							moveDir.mkdir();
@@ -168,17 +210,17 @@ public class FTPManager {
 	}
 	
 	private File setLocalDirectory() throws FTPManagerException {
-		if (properties.getProperty("fromdir") == null) {
-			LOGGER.error("Property fromdir must be set");
-			throw new FTPManagerException ("Property fromdir must be set");
+		if (localDir == null) {
+			LOGGER.error("The local directory path must be set");
+			throw new FTPManagerException ("The local directory path must be set");
 		}
 
-
-		
-		File folder = new File(properties.getProperty("fromdir"));
+		File folder = new File(localDir);
 		if (!(folder.isDirectory() && folder.canRead())) { 
-			LOGGER.error("Property fromdir "+ folder.getAbsolutePath() + "is not a directory or can not be read");
-			throw new FTPManagerException ("Property fromdir "+ folder.getAbsolutePath() + "is not a directory or can not be read");
+			LOGGER.error("The local directory path "+ folder.getAbsolutePath() + 
+					" is not a directory or can not be read");
+			throw new FTPManagerException ("The local directory path "+ folder.getAbsolutePath() + 
+					" is not a directory or can not be read");
 		}
 		return folder;
 	}
@@ -186,73 +228,74 @@ public class FTPManager {
 	
 	private void setRemoteDirectory() throws IOException, FTPManagerException {
 		int reply;
-		if (properties.getProperty("todir") != null ) {
-			ftp.changeWorkingDirectory(properties.getProperty("todir"));
+		if (remoteDir != null ) {
+			ftp.changeWorkingDirectory(remoteDir);
 			reply = ftp.getReplyCode();
 
 			if(!FTPReply.isPositiveCompletion(reply)) {
+				LOGGER.error("Unable to change working directory " +
+						"to: " + remoteDir + ": " + reply);
 				throw new FTPManagerException ("Unable to change working directory " +
-						"to: " + properties.getProperty("todir"));
+						"to: " + remoteDir + ": " + reply);
 			}
 		}
 	}
 
-	private void setMode() {
+	
+	private void connectionMode() {
 		// Set mode - passive or active
-		if (properties.getProperty("mode") == null) {
-			ftp.enterLocalPassiveMode();
 
+		if (connectionMode.equalsIgnoreCase("passive")) {
+			ftp.enterLocalPassiveMode();
+		} else if (connectionMode.equalsIgnoreCase("active")) {
+			ftp.enterLocalActiveMode();
 		} else {
-			if (properties.getProperty("mode").equalsIgnoreCase("passive")) {
-				ftp.enterLocalPassiveMode();
-			} else if (properties.getProperty("mode").equalsIgnoreCase("active")) {
-				ftp.enterLocalActiveMode();
-			} else {
-				ftp.enterLocalPassiveMode();
-			}
+			ftp.enterLocalPassiveMode();
 		}
 	}
 
+	
 	private void transferMode() throws IOException {
 		// Set transfer type
-		if (properties.getProperty("fileType") == null) {
+		if (transferMode.equalsIgnoreCase("ascii")) {
 			ftp.setFileType(FTP.ASCII_FILE_TYPE);
-		} else {
-			if (properties.getProperty("fileType").equalsIgnoreCase("ascii")) {
-				ftp.setFileType(FTP.ASCII_FILE_TYPE);
-			} else if (properties.getProperty("fileType").equalsIgnoreCase("binary")) {
-				ftp.setFileType(FTP.BINARY_FILE_TYPE);
-			}
-			else {
-				ftp.setFileType(FTP.ASCII_FILE_TYPE);
-			}
+		} else if (transferMode.equalsIgnoreCase("binary")) {
+			ftp.setFileType(FTP.BINARY_FILE_TYPE);
+		}
+		else {
+			ftp.setFileType(FTP.ASCII_FILE_TYPE);
 		}
 	}
 
+	
 	private void login() throws IOException, FTPManagerException {
-		if (!ftp.login(properties.getProperty("username"),properties.getProperty("password"))) {
+		if (!ftp.login(username, password)) {
 			LOGGER.error("Unable to login to FTP server " +
-		            "using username " + properties.getProperty("username")+" " +
-		            "and password " + properties.getProperty("password"));
-		    throw new FTPManagerException ("Unable to login to FTP server " +
-		                         "using username "+properties.getProperty("username")+" " +
-		                         "and password "+properties.getProperty("password"));
+		            "using username " + username +
+		            ". Check username and password.");
+			throw new FTPManagerException ("Unable to login to FTP server " +
+					"using username " + username +
+					". Check username and password.");
 		}
 	}
 
+	
 	private void connect() throws FTPManagerException {
-		ftp.setConnectTimeout(Integer.parseInt(properties.getProperty("timeout", "2000")));
+		ftp.setConnectTimeout(connectTimeout);
 		
 		try {
-			ftp.connect(properties.getProperty("hostname"));
+			ftp.connect(hostName, port);
 		} catch (SocketException e) {
+			LOGGER.error("FTP server "+ hostName + " refused connection at port " + port,e);
 			throw new FTPManagerException ("FTP server refused connection.", e);
 		} catch (IOException e) {
+			LOGGER.error("FTP server "+ hostName + " refused connection at port " + port,e);
 			throw new FTPManagerException ("FTP server refused connection.", e);
 		}
 		int reply = ftp.getReplyCode();
 		if(!FTPReply.isPositiveCompletion(reply)) {
-			throw new FTPManagerException ("FTP server refused connection with status " + ftp.getReplyString());
+			LOGGER.error("FTP server "+ hostName + " refused connection with status " + ftp.getReplyString());
+			throw new FTPManagerException ("FTP server " + hostName + " refused connection with status " + ftp.getReplyString());
 		}
 	}
 
