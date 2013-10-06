@@ -89,7 +89,7 @@ public class ETLScriptella implements ETLInf {
 					strbuf.append("\"statement_count:\"").append(info.getStatementsCount()).append("\" , ");
 					strbuf.append("\"success_count:\"").append(info.getSuccessfulExecutionCount()).append("\" , ");
 					strbuf.append("\"failed_count:\"").append(info.getFailedExecutionCount()).append("\" , ");
-					strbuf.append("\"throughput:\"").append(info.getThroughput()).append("\" , ");
+					strbuf.append("\"throughput:\"").append(info.getThroughput());
 					strbuf.append("}");
 					LOGGER.info(strbuf.toString());
 				}
