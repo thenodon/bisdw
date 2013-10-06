@@ -15,6 +15,39 @@ import org.apache.commons.net.ftp.FTPReply;
 import org.apache.log4j.Logger;
 
 
+/**
+ * The FTPManager ftp connections. A manager object is created by a property 
+ * list that control the connection.
+ * The usage is basically the following:<p>
+ * <code>
+ * FTPManager ftp = new FTPManager(properties);<br>
+ * try {<br>
+ * &nbsp;&nbsp;ftp.init();<br>
+ * &nbsp;&nbsp;ftp.putAllDirectory();<br>
+ * } catch (IOException e) {<br>
+ * &nbsp;&nbsp;......<br>
+ * } catch(FTPManagerException e) {<br>
+ * &nbsp;&nbsp;.....	<br>
+ * } finally {<br>
+ * &nbsp;&nbsp;ftp.disconnect();<br>
+ * }<br>
+ * </code> 
+ * <p>
+ * The following properties are supported:<br>
+ * <ul>
+ * <li><i>hostname</i> - the name or IP of the ftp server to connect to.</li>
+ * <li><i>port</i> - the socket port used by the ftp server, default is 21.</li>
+ * <li><i>timeout</i> - connection timeout, default is 2000 ms.</li>
+ * <li><i>username</i> - username for the ftp server.</li>
+ * <li><i>password</i> - password for the username</li>
+ * <li><i>transferMode</i> - ascii or binary, default is ascii</li>
+ * <li><i>connectionMode</i> - active or passive, default is passive</li>
+ * <li><i>remoteDir</i> - the directory on ftp server side, default is the current directory after login.</li>
+ * <li><i>localDir</i> - the directory on the local side.</li>
+ * <li><i>moveFileAfterSend</i> - move the files after transfer to the directory .save in the 
+ * localDir default is true. If set to false the file is just deleted.</li>
+ * </ul>
+ */
 public class FTPManager {
 
 	private static final Logger LOGGER = Logger.getLogger(FTPManager.class);
@@ -46,12 +79,16 @@ public class FTPManager {
 		password          = properties.getProperty("password");
 		transferMode      = properties.getProperty("transferMode", "ascii");
 		connectionMode    = properties.getProperty("connectionMode","passive");
-		remoteDir         = properties.getProperty("todir");
-		localDir          = properties.getProperty("fromdir");
+		remoteDir         = properties.getProperty("remoteDir");
+		localDir          = properties.getProperty("localDir");
 		moveFileAfterSend = Boolean.valueOf(properties.getProperty("moveDir","true"));
 	}
 	
-	
+	/**
+	 * Initialize the ftp connection. This include connecting, login, 
+	 * setting connection modes, change remote and local directory.
+	 * @throws FTPManagerException if any of the initialization do not work
+	 */
 	public void init() throws FTPManagerException{
 		try {
 			connect();
@@ -76,7 +113,9 @@ public class FTPManager {
 		} 
 	}
 	
-	
+	/**
+	 * Disconnect from the ftp server.
+	 */
 	public void disconnect() {
 		try {
             ftp.disconnect();
@@ -85,22 +124,13 @@ public class FTPManager {
         }
 	}
 	
-	
-	private StringBuffer ftpInfo() throws IOException {
-		StringBuffer strbuf = new StringBuffer();
-		strbuf.append("{");
-		strbuf.append("server:").append(ftp.getRemoteAddress().getHostAddress()).append(", ");
-		strbuf.append("connectionMode:").append(ftp.getDataConnectionMode()).append(", ");
-		strbuf.append("connectionModeSet:").append(connectionMode).append(", ");
-		strbuf.append("transferMode:").append(transferMode).append(", ");
-		strbuf.append("ctrlenc:").append(ftp.getControlEncoding()).append(", ");
-		strbuf.append("systemtype:").append(ftp.getSystemType()).append(", ");
-		strbuf.append("charset:").append(ftp.getCharset().name());
-		strbuf.append("}");
-		return strbuf;
-	}
 
-	
+	/**
+	 * Send all files in the localDir to the remoteDir on the ftp server.
+	 * @throws IOException occur if the local file do not exists, if there is 
+	 * IO related issues to the transfer or if the local file can not be copied
+	 * to the .save directory. All scenarios are logged on ERROR level.
+	 */
 	public void putAllDirectory() throws IOException {
 		
 		int reply;
@@ -170,6 +200,22 @@ public class FTPManager {
 		LOGGER.info(count + " files sent to " + ftp.getRemoteAddress().getHostAddress());
 	}
 
+
+	private StringBuffer ftpInfo() throws IOException {
+		StringBuffer strbuf = new StringBuffer();
+		strbuf.append("{");
+		strbuf.append("server:").append(ftp.getRemoteAddress().getHostAddress()).append(", ");
+		strbuf.append("connectionMode:").append(ftp.getDataConnectionMode()).append(", ");
+		strbuf.append("connectionModeSet:").append(connectionMode).append(", ");
+		strbuf.append("transferMode:").append(transferMode).append(", ");
+		strbuf.append("ctrlenc:").append(ftp.getControlEncoding()).append(", ");
+		strbuf.append("systemtype:").append(ftp.getSystemType()).append(", ");
+		strbuf.append("charset:").append(ftp.getCharset().name());
+		strbuf.append("}");
+		return strbuf;
+	}
+
+	
 	
 	private void copyFile(File sourceFile, File destFile) throws IOException {
 	    if(!destFile.exists()) {
