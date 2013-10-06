@@ -10,7 +10,7 @@
 \fancyfoot{}
 \fancyfoot[C]{\thepage}
 %\fancyhead[LE,RO]{\slshape bischeck Readme}
-\fancyhead[LE,RO]{bischeck - A business activity check command server for Nagios}
+\fancyhead[LE,RO]{bisdw - A simple ETL tool}
 \renewcommand{\headrulewidth}{0.4pt}
 \renewcommand{\footrulewidth}{0.4pt}
 %\lhead{bischeck}
@@ -99,7 +99,7 @@ bisdw
 \begin_inset Newline newline
 \end_inset
 
-Bisdw -a simple ETL tool 
+A simple ETL tool 
 \end_layout
 
 \begin_layout Date
@@ -107,7 +107,7 @@ Version 0.2.0
 \begin_inset Newline newline
 \end_inset
 
-2013-09-17
+2013-10-06
 \end_layout
 
 \begin_layout Standard
@@ -144,7 +144,16 @@ target "http://scriptella.javaforge.com/"
 
 \end_inset
 
-to enable ETL functionality, but can be extended in a simple way.
+to enable ETL functionality, but can be extended in 
+\begin_inset Preview
+
+\begin_layout Standard
+
+\end_layout
+
+\end_inset
+
+a simple way.
  
 \end_layout
 
@@ -171,6 +180,12 @@ The main configuration file is the bidw.xml.
 \end_layout
 
 \begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "label:bisdw.xml-configuration"
+
+\end_inset
+
 bisdw.xml configuration
 \end_layout
 
@@ -191,8 +206,8 @@ status open
 
 \begin_layout Plain Layout
 
-<bisdw xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchema
-Location="../src/main/resources/bisdw.xsd">
+<bisdw xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 	xsi:noNamespaceSchem
+aLocation="../src/main/resources/bisdw.xsd"> 	
 \end_layout
 
 \begin_layout Plain Layout
@@ -202,62 +217,197 @@ Location="../src/main/resources/bisdw.xsd">
 
 \begin_layout Plain Layout
 
-    <name>read_DB</name>
+    <name>read_DB</name> 		
 \end_layout
 
 \begin_layout Plain Layout
 
-    <desc>Database</desc>
+    <desc>Database</desc> 		
 \end_layout
 
 \begin_layout Plain Layout
 
-    <schedule>0 */1 * * * ?</schedule>
+    <schedule>* */30 * * * ?</schedule>
 \end_layout
 
 \begin_layout Plain Layout
 
-    <etlconfig name="read_db">
+	
 \end_layout
 
 \begin_layout Plain Layout
 
-      <desc>read db</desc>
+    <etlconfig name="read_db"> 			
 \end_layout
 
 \begin_layout Plain Layout
 
-	    <class>com.ingby.socbox.bisdw.etlprovider.ETLScriptella</class>
+      <desc>read db</desc> 			
 \end_layout
 
 \begin_layout Plain Layout
 
-	    <order>10</order>
+      <class>com.ingby.socbox.bisdw.etlprovider.ETLScriptella</class> 			
 \end_layout
 
 \begin_layout Plain Layout
 
-	    <property>
+      <order>10</order>
 \end_layout
 
 \begin_layout Plain Layout
 
-	      <key>configFile</key>
+      <property> 				
 \end_layout
 
 \begin_layout Plain Layout
 
-		  <value>read_db.xml</value>
+        <key>configFile</key> 				
 \end_layout
 
 \begin_layout Plain Layout
 
-	    </property>
+        <value>read_db.xml</value> 			
 \end_layout
 
 \begin_layout Plain Layout
 
-    </etlconfig>
+      </property> 	
+\end_layout
+
+\begin_layout Plain Layout
+
+	</etlconfig>
+\end_layout
+
+\begin_layout Plain Layout
+
+      
+\end_layout
+
+\begin_layout Plain Layout
+
+    <etlconfig name="send_ftp">
+\end_layout
+
+\begin_layout Plain Layout
+
+      <desc>send_ftp</desc>  
+\end_layout
+
+\begin_layout Plain Layout
+
+      <class>com.ingby.socbox.bisdw.etlprovider.FTPSend</class>  
+\end_layout
+
+\begin_layout Plain Layout
+
+      <order>20</order>
+\end_layout
+
+\begin_layout Plain Layout
+
+      <property>  
+\end_layout
+
+\begin_layout Plain Layout
+
+        <key>hostname</key> 
+\end_layout
+
+\begin_layout Plain Layout
+
+        <value>172.25.1.203</value> 
+\end_layout
+
+\begin_layout Plain Layout
+
+      </property>      
+\end_layout
+
+\begin_layout Plain Layout
+
+      <property>    
+\end_layout
+
+\begin_layout Plain Layout
+
+        <key>username</key> 
+\end_layout
+
+\begin_layout Plain Layout
+
+        <value>ftpuser</value> 
+\end_layout
+
+\begin_layout Plain Layout
+
+      </property> 
+\end_layout
+
+\begin_layout Plain Layout
+
+      <property>     
+\end_layout
+
+\begin_layout Plain Layout
+
+        <key>password</key>      
+\end_layout
+
+\begin_layout Plain Layout
+
+        <value>abcxyz</value>   
+\end_layout
+
+\begin_layout Plain Layout
+
+      </property>  
+\end_layout
+
+\begin_layout Plain Layout
+
+      <property>    
+\end_layout
+
+\begin_layout Plain Layout
+
+        <key>localDir</key>        
+\end_layout
+
+\begin_layout Plain Layout
+
+        <value>/tmp/shipment</value>
+\end_layout
+
+\begin_layout Plain Layout
+
+      </property>
+\end_layout
+
+\begin_layout Plain Layout
+
+      <property>  
+\end_layout
+
+\begin_layout Plain Layout
+
+        <key>remoteDir</key>    
+\end_layout
+
+\begin_layout Plain Layout
+
+        <value>ship</value> 
+\end_layout
+
+\begin_layout Plain Layout
+
+      </property> 
+\end_layout
+
+\begin_layout Plain Layout
+
+    </etlconfig> 	
 \end_layout
 
 \begin_layout Plain Layout
@@ -267,11 +417,7 @@ Location="../src/main/resources/bisdw.xsd">
 
 \begin_layout Plain Layout
 
-</bisdw>
-\end_layout
-
-\begin_layout Plain Layout
-
+</bisdw> 
 \end_layout
 
 \end_inset
@@ -298,6 +444,12 @@ Each etlconfig has a class specification that define the java class to be
 \end_layout
 
 \begin_layout Subsection
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Scheduling"
+
+\end_inset
+
 Scheduling
 \end_layout
 
@@ -307,6 +459,12 @@ Each etljob can have multiple schedule tags, but at least one.
 \end_layout
 
 \begin_layout Subsubsection
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Interval-scheduling"
+
+\end_inset
+
 Interval scheduling
 \end_layout
 
@@ -335,6 +493,12 @@ status open
 \end_layout
 
 \begin_layout Subsubsection
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Cron-based-scheduling"
+
+\end_inset
+
 Cron based scheduling
 \end_layout
 
@@ -397,6 +561,12 @@ status open
 \end_layout
 
 \begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Etlconfig-configuration"
+
+\end_inset
+
 Etlconfig configuration
 \end_layout
 
@@ -425,10 +595,238 @@ target "http://scriptella.javaforge.com/reference/index.html"
 
 \end_inset
 
+.
+\end_layout
+
+\begin_layout Standard
+Below listing show a simple example of a scriptella configuration that select
+ from a mysql database and create an xml file based on the result and write
+ it to directory 
+\emph on
+/tmp/shipment
+\emph default
+.
+ Each file will be written to a unique file name using the 
+\emph on
+etl.date.today
+\emph default
+ macro.
+\end_layout
+
+\begin_layout Standard
+\begin_inset listings
+lstparams "basicstyle={\ttfamily},breaklines=true,language=XML,numbers=right,tabsize=2"
+inline false
+status open
+
+\begin_layout Plain Layout
+
+<!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd">  
+\end_layout
+
+\begin_layout Plain Layout
+
+<etl>    
+\end_layout
+
+\begin_layout Plain Layout
+
+  <description>Example</description>   
+\end_layout
+
+\begin_layout Plain Layout
+
+  <properties>
+\end_layout
+
+\begin_layout Plain Layout
+
+    filedepo=/tmp/shipment/ 
+\end_layout
+
+\begin_layout Plain Layout
+
+  </properties>    
+\end_layout
+
+\begin_layout Plain Layout
+
+ <connection id="mydb" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost/b
+isdwtest" user="testdb" password="testdb" />
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+  <connection id="outfile" driver="text" url="$filedepo/shipment_${etl.date.today(
+'yyyyMMdd-HHmmss')}.xml" >    
+\end_layout
+
+\begin_layout Plain Layout
+
+    null_string=   
+\end_layout
+
+\begin_layout Plain Layout
+
+  </connection>
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+  <!--Writing header -->   
+\end_layout
+
+\begin_layout Plain Layout
+
+  <script connection-id="outfile">     
+\end_layout
+
+\begin_layout Plain Layout
+
+    &lt;shipments&gt;   
+\end_layout
+
+\begin_layout Plain Layout
+
+  </script>
+\end_layout
+
+\begin_layout Plain Layout
+
+  
+\end_layout
+
+\begin_layout Plain Layout
+
+  <!-- Run query against db -->   
+\end_layout
+
+\begin_layout Plain Layout
+
+  <query connection-id="mydb">   
+\end_layout
+
+\begin_layout Plain Layout
+
+    <!-- Select all shipments with pckp_dt TODAY and inbnd_ind = O from
+ shipmentdb-->    
+\end_layout
+
+\begin_layout Plain Layout
+
+    SELECT ship_id, no_pce, tot_wght FROM shipment;
+\end_layout
+
+\begin_layout Plain Layout
+
+    
+\end_layout
+
+\begin_layout Plain Layout
+
+    <!-- For each row execute a script and write xml structure to out file
+ -->    
+\end_layout
+
+\begin_layout Plain Layout
+
+    <script connection-id="outfile">   
+\end_layout
+
+\begin_layout Plain Layout
+
+    <![CDATA[  
+\end_layout
+
+\begin_layout Plain Layout
+
+      <shipment>    
+\end_layout
+
+\begin_layout Plain Layout
+
+      <id>$ship_id</id> 
+\end_layout
+
+\begin_layout Plain Layout
+
+      <weight>$tot_wght</weight> 
+\end_layout
+
+\begin_layout Plain Layout
+
+      <pieces>$no_pce</pieces>   
+\end_layout
+
+\begin_layout Plain Layout
+
+      </shipment>]]>    
+\end_layout
+
+\begin_layout Plain Layout
+
+    </script>
+\end_layout
+
+\begin_layout Plain Layout
+
+  </query>   
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+  <!--Writing footer -->   
+\end_layout
+
+\begin_layout Plain Layout
+
+  <script connection-id="outfile">      
+\end_layout
+
+\begin_layout Plain Layout
+
+    &lt;/shipments&gt;  
+\end_layout
+
+\begin_layout Plain Layout
+
+  </script>    
+\end_layout
+
+\begin_layout Plain Layout
+
+</etl> 
+\end_layout
+
+\begin_layout Plain Layout
+
  
 \end_layout
 
+\end_inset
+
+
+\end_layout
+
 \begin_layout Subsection
+\begin_inset CommandInset label
+LatexCommand label
+name "label:FTPSend-configuration"
+
+\end_inset
+
 FTPSend configuration
 \end_layout
 
@@ -524,6 +922,21 @@ moveFileAfterSend
  - move the files after transfer to the directory .save in the localDir default
  is true.
  If set to false the file is just deleted after successful transfer.
+\end_layout
+
+\begin_layout Standard
+As and example see the listing in the 
+\begin_inset CommandInset ref
+LatexCommand vref
+reference "label:bisdw.xml-configuration"
+
+\end_inset
+
+ that read any file located in the 
+\emph on
+/tmp/shipment
+\emph default
+ directory.
 \end_layout
 
 \begin_layout Section
@@ -877,6 +1290,12 @@ resources
 \end_layout
 
 \begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Run-Bisdw-from"
+
+\end_inset
+
 Run Bisdw from the command line
 \end_layout
 
@@ -982,6 +1401,12 @@ This command is used in the init script bischeckd to retrieve the current
 \end_layout
 
 \begin_layout Section
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Validating-configuration-files"
+
+\end_inset
+
 Validating configuration files
 \end_layout
 
@@ -1018,7 +1443,13 @@ Releases
 \end_layout
 
 \begin_layout Section
-Release 0.1.2 - 2013-09-17
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Release-0.2.0"
+
+\end_inset
+
+Release 0.2.0 - 2013-10-06
 \end_layout
 
 \begin_layout Standard
@@ -1422,6 +1853,12 @@ l
 \end_layout
 
 \begin_layout Chapter
+\begin_inset CommandInset label
+LatexCommand label
+name "label:Bug-reports-and"
+
+\end_inset
+
 Bug reports and feature requests
 \end_layout
 
