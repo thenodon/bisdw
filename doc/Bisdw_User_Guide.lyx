@@ -57,7 +57,7 @@
 \paperfontsize default
 \spacing single
 \use_hyperref false
-\papersize legalpaper
+\papersize letterpaper
 \use_geometry false
 \use_amsmath 1
 \use_esint 1
@@ -91,10 +91,6 @@
 \begin_body
 
 \begin_layout Title
-User Guide 
-\begin_inset Newline newline
-\end_inset
-
 
 \series medium
 bisdw
@@ -187,16 +183,7 @@ target "http://scriptella.javaforge.com/"
 
 \end_inset
 
-to enable ETL functionality, but can be extended in 
-\begin_inset Preview
-
-\begin_layout Standard
-
-\end_layout
-
-\end_inset
-
-a simple way.
+to enable ETL functionality, but can be extended in a simple way.
  
 \end_layout
 
