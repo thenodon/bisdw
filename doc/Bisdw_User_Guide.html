@@ -1,0 +1,680 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+<meta name="generator" content="http://www.nongnu.org/elyxer/"/>
+<meta name="create-date" content="2013-10-10"/>
+<link rel="stylesheet" href="http://elyxer.nongnu.org/lyx.css" type="text/css" media="all"/>
+<title>bisdw-A simple ETL tool</title>
+</head>
+<body>
+<div id="globalWrapper">
+<h1 class="title">
+bisdw<br/>
+-<br/>
+A simple ETL tool
+</h1>
+<h2 class="Date">
+Version 0.2.0 <br/>
+2013-10-06
+</h2>
+<div class="Unindented">
+<div class="fulltoc">
+<div class="tocheader">
+Table of Contents
+</div>
+<div class="tocindent">
+<div class="toc">
+<a class="Link" href="#toc-Chapter-1">Chapter 1: Introduction</a>
+</div>
+<div class="toc">
+<a class="Link" href="#toc-Chapter-2">Chapter 2: Configuration</a>
+</div>
+<div class="tocindent">
+<div class="toc">
+<a class="Link" href="#toc-Section-2.1">Section 2.1: bisdw.xml configuration</a>
+</div>
+<div class="tocindent">
+<div class="toc">
+<a class="Link" href="#toc-Subsection-2.1.1">Subsection 2.1.1: Scheduling</a>
+</div>
+<div class="tocindent">
+<div class="toc">
+<a class="Link" href="#toc-Subsubsection-2.1.1.1">Subsubsection 2.1.1.1: Interval scheduling</a>
+</div>
+<div class="toc">
+<a class="Link" href="#toc-Subsubsection-2.1.1.2">Subsubsection 2.1.1.2: Cron based scheduling</a>
+</div>
+</div>
+</div>
+<div class="toc">
+<a class="Link" href="#toc-Section-2.2">Section 2.2: Etlconfig configuration</a>
+</div>
+<div class="tocindent">
+<div class="toc">
+<a class="Link" href="#toc-Subsection-2.2.1">Subsection 2.2.1: ETLScriptella configuration</a>
+</div>
+<div class="toc">
+<a class="Link" href="#toc-Subsection-2.2.2">Subsection 2.2.2: FTPSend configuration</a>
+</div>
+</div>
+<div class="toc">
+<a class="Link" href="#toc-Section-2.3">Section 2.3: properties.xml</a>
+</div>
+</div>
+<div class="toc">
+<a class="Link" href="#toc-Chapter-3">Chapter 3: Building Bisdw</a>
+</div>
+<div class="tocindent">
+<div class="toc">
+<a class="Link" href="#toc-Section-3.1">Section 3.1: Jar customization</a>
+</div>
+<div class="toc">
+<a class="Link" href="#toc-Section-3.2">Section 3.2: Developing with Bisdw</a>
+</div>
+</div>
+<div class="toc">
+<a class="Link" href="#toc-Chapter-4">Chapter 4: Installation</a>
+</div>
+<div class="tocindent">
+<div class="toc">
+<a class="Link" href="#toc-Section-4.1">Section 4.1: Getting started</a>
+</div>
+<div class="toc">
+<a class="Link" href="#toc-Section-4.2">Section 4.2: Logging</a>
+</div>
+</div>
+<div class="toc">
+<a class="Link" href="#toc-Chapter-5">Chapter 5: Run Bisdw from the command line</a>
+</div>
+<div class="tocindent">
+<div class="toc">
+<a class="Link" href="#toc-Section-5.1">Section 5.1: Validating configuration files</a>
+</div>
+</div>
+<div class="toc">
+<a class="Link" href="#toc-Chapter-6">Chapter 6: Releases</a>
+</div>
+<div class="tocindent">
+<div class="toc">
+<a class="Link" href="#toc-Section-6.1">Section 6.1: Release 0.2.0 - 2013-10-06</a>
+</div>
+</div>
+<div class="toc">
+<a class="Link" href="#toc-Chapter-7">Chapter 7: System requirements</a>
+</div>
+<div class="toc">
+<a class="Link" href="#toc-Chapter-8">Chapter 8: Bisdw license </a>
+</div>
+<div class="toc">
+<a class="Link" href="#toc-Chapter-9">Chapter 9: Bug reports and feature requests</a>
+</div>
+<div class="toc">
+<a class="Link" href="#toc-Chapter-10">Chapter 10: Credits</a>
+</div>
+</div>
+
+</div>
+ 
+</div>
+<h1 class="Chapter">
+<a class="toc" name="toc-Chapter-1">1</a> <a class="Label" name="label:Introduction"> </a>Introduction
+</h1>
+<div class="Unindented">
+ 
+</div>
+<div class="Indented">
+Bisdw is a simple ETL tool that is target to extract data from different source. It can use different embedded ways to do the extraction from different kind of databases, files, etc. In addition Bisdw support FTP based transfer of the result of the extraction process. Bisdw use the open source project <a class="URL" href="http://scriptella.javaforge.com/">Scriptella</a>to enable ETL functionality, but can be extended in a simple way. 
+</div>
+<div class="Indented">
+Bisdw runs as a daemon process. By configuration Bisdw will run different ETL jobs based on scheduling definition that are defined for each job. 
+</div>
+<h1 class="Chapter">
+<a class="toc" name="toc-Chapter-2">2</a> <a class="Label" name="label:Configuration"> </a>Configuration
+</h1>
+<div class="Unindented">
+ 
+</div>
+<div class="Indented">
+The main configuration file is the bidw.xml. Additional common properties are set in the properties.xml fle.
+</div>
+<h2 class="Section">
+<a class="toc" name="toc-Section-2.1">2.1</a> <a class="Label" name="label:bisdw.xml-configuration"> </a>bisdw.xml configuration
+</h2>
+<div class="Unindented">
+Bisdw is configured by defining ETLs jobs in the in the bisdw.xml file.
+</div>
+<div class="Indented">
+<div class="listing">
+<pre class="listing"><span class="number-right">1</span>&lt;?xml version="1.0" encoding="UTF-8"?&gt; 
+<span class="number-right">2</span>&lt;bisdw xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 	xsi:noNamespaceSchemaLocation="../src/main/resources/bisdw.xsd"&gt; 	
+<span class="number-right">3</span>  &lt;etljob&gt; 		
+<span class="number-right">4</span>    &lt;name&gt;read_DB&lt;/name&gt; 		
+<span class="number-right">5</span>    &lt;desc&gt;Database&lt;/desc&gt; 		
+<span class="number-right">6</span>    &lt;schedule&gt;* */30 * * * ?&lt;/schedule&gt;
+<span class="number-right">7</span>	
+<span class="number-right">8</span>    &lt;etlconfig name="read_db"&gt; 			
+<span class="number-right">9</span>      &lt;desc&gt;read db&lt;/desc&gt; 			
+<span class="number-right">10</span>      &lt;class&gt;com.ingby.socbox.bisdw.etlprovider.ETLScriptella&lt;/class&gt; 			
+<span class="number-right">11</span>      &lt;order&gt;10&lt;/order&gt;
+<span class="number-right">12</span>      &lt;property&gt; 				
+<span class="number-right">13</span>        &lt;key&gt;configFile&lt;/key&gt; 				
+<span class="number-right">14</span>        &lt;value&gt;read_db.xml&lt;/value&gt; 			
+<span class="number-right">15</span>      &lt;/property&gt; 	
+<span class="number-right">16</span>	&lt;/etlconfig&gt;
+<span class="number-right">17</span>      
+<span class="number-right">18</span>    &lt;etlconfig name="send_ftp"&gt;
+<span class="number-right">19</span>      &lt;desc&gt;send_ftp&lt;/desc&gt;  
+<span class="number-right">20</span>      &lt;class&gt;com.ingby.socbox.bisdw.etlprovider.FTPSend&lt;/class&gt;  
+<span class="number-right">21</span>      &lt;order&gt;20&lt;/order&gt;
+<span class="number-right">22</span>      &lt;property&gt;  
+<span class="number-right">23</span>        &lt;key&gt;hostname&lt;/key&gt; 
+<span class="number-right">24</span>        &lt;value&gt;172.25.1.203&lt;/value&gt; 
+<span class="number-right">25</span>      &lt;/property&gt;      
+<span class="number-right">26</span>      &lt;property&gt;    
+<span class="number-right">27</span>        &lt;key&gt;username&lt;/key&gt; 
+<span class="number-right">28</span>        &lt;value&gt;ftpuser&lt;/value&gt; 
+<span class="number-right">29</span>      &lt;/property&gt; 
+<span class="number-right">30</span>      &lt;property&gt;     
+<span class="number-right">31</span>        &lt;key&gt;password&lt;/key&gt;      
+<span class="number-right">32</span>        &lt;value&gt;abcxyz&lt;/value&gt;   
+<span class="number-right">33</span>      &lt;/property&gt;  
+<span class="number-right">34</span>      &lt;property&gt;    
+<span class="number-right">35</span>        &lt;key&gt;localDir&lt;/key&gt;        
+<span class="number-right">36</span>        &lt;value&gt;/tmp/shipment&lt;/value&gt;
+<span class="number-right">37</span>      &lt;/property&gt;
+<span class="number-right">38</span>      &lt;property&gt;  
+<span class="number-right">39</span>        &lt;key&gt;remoteDir&lt;/key&gt;    
+<span class="number-right">40</span>        &lt;value&gt;ship&lt;/value&gt; 
+<span class="number-right">41</span>      &lt;/property&gt; 
+<span class="number-right">42</span>    &lt;/etlconfig&gt; 	
+<span class="number-right">43</span>  &lt;/etljob&gt;
+<span class="number-right">44</span>&lt;/bisdw&gt; 
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+Each &lt;etljob&gt; can include one to many &lt;etlconfig&gt;. A &lt;etljob&gt; will execute all etlconfig’s part of the job according to the cron expression in the &lt;schedule&gt; tag, but in the sequence order specified in the &gt;order&gt; tag. The etlconfig’s will be executed in the order of the lowest order first. This is important if there is a data dependencies between the different etlconfig’s. By using the order tag a sequence of execution is quarantined.
+</div>
+<div class="Indented">
+Each etlconfig has a class specification that define the java class to be executed by the etljob. A list of properties can be specified that is specific by the specified class.
+</div>
+<h3 class="Subsection">
+<a class="toc" name="toc-Subsection-2.1.1">2.1.1</a> <a class="Label" name="label:Scheduling"> </a>Scheduling
+</h3>
+<div class="Unindented">
+Each etljob can have multiple schedule tags, but at least one. The scheduling can have two different formats, interval or cron based.
+</div>
+<h4 class="Subsubsection">
+<a class="toc" name="toc-Subsubsection-2.1.1.1">2.1.1.1</a> <a class="Label" name="label:Interval-scheduling"> </a>Interval scheduling
+</h4>
+<div class="Unindented">
+The simple format describe a interval execution that are repeated forever. The format is just a number and a indicator defining the granularity in seconds (S), minutes (M) or hours (H). 10M specify that the service should be executed every ten minutes. 
+</div>
+<div class="Indented">
+<div class="listing">
+<pre class="listing"><span class="number-right">1</span>&lt;schedule&gt;10M&lt;/schedule&gt;		
+</pre>
+</div>
+
+</div>
+<h4 class="Subsubsection">
+<a class="toc" name="toc-Subsubsection-2.1.1.2">2.1.1.2</a> <a class="Label" name="label:Cron-based-scheduling"> </a>Cron based scheduling
+</h4>
+<div class="Unindented">
+The second format is more advanced and follow the cron specification of Quartz, see <a class="FlexURL" href="http://www.quartz-scheduler.org">http://www.quartz-scheduler.org</a>. With this format its possible to define scheduling expression like <i>&ldquo;0 15 10 ? * MON-FRI&rdquo;</i> which would schedule the service at 10:15am every Monday, Tuesday, Wednesday, Thursday and Friday. For more cron examples please visit <a class="FlexURL" href="http://www.quartz-scheduler.org/documentation/quartz-2.1.x/tutorials/crontrigger">http://www.quartz-scheduler.org/documentation/quartz-2.1.x/tutorials/crontrigger</a>
+</div>
+<div class="Indented">
+<div class="listing">
+<pre class="listing"><span class="number-right">1</span>&lt;schedule&gt;0 15 10 ? * MON-FRI&lt;/schedule&gt;		
+</pre>
+</div>
+
+</div>
+<h2 class="Section">
+<a class="toc" name="toc-Section-2.2">2.2</a> <a class="Label" name="label:Etlconfig-configuration"> </a>Etlconfig configuration
+</h2>
+<h3 class="Subsection">
+<a class="toc" name="toc-Subsection-2.2.1">2.2.1</a> <a class="Label" name="label:ETLScriptella_configuration"> </a>ETLScriptella configuration
+</h3>
+<div class="Unindented">
+The ETLScriptella takes one property from the etlconfig definition in bisdw.xml. The property is the <i>configFile</i> and specify the scriptella script file to read and execute. For more information about Scriptella configuration please visit <a class="URL" href="http://scriptella.javaforge.com/reference/index.html">Scriptella documentation</a>.
+</div>
+<div class="Indented">
+Below listing show a simple example of a scriptella configuration that select from a mysql database and create an xml file based on the result and write it to directory <i>/tmp/shipment</i>. Each file will be written to a unique file name using the <i>etl.date.today</i> macro.
+</div>
+<div class="Indented">
+<div class="listing">
+<pre class="listing"><span class="number-right">1</span>&lt;!DOCTYPE etl SYSTEM "http://scriptella.javaforge.com/dtd/etl.dtd"&gt;  
+<span class="number-right">2</span>&lt;etl&gt;    
+<span class="number-right">3</span>  &lt;description&gt;Example&lt;/description&gt;   
+<span class="number-right">4</span>  &lt;properties&gt;
+<span class="number-right">5</span>    filedepo=/tmp/shipment/ 
+<span class="number-right">6</span>  &lt;/properties&gt;    
+<span class="number-right">7</span> &lt;connection id="mydb" driver="com.mysql.jdbc.Driver" url="jdbc:mysql://localhost/bisdwtest" user="testdb" password="testdb" /&gt;
+<span class="number-right">8</span>​
+<span class="number-right">9</span>  &lt;connection id="outfile" driver="text" url="$filedepo/shipment_${etl.date.today(’yyyyMMdd-HHmmss’)}.xml" &gt;    
+<span class="number-right">10</span>    null_string=   
+<span class="number-right">11</span>  &lt;/connection&gt;
+<span class="number-right">12</span>​
+<span class="number-right">13</span>  &lt;!--Writing header --&gt;   
+<span class="number-right">14</span>  &lt;script connection-id="outfile"&gt;     
+<span class="number-right">15</span>    &amp;lt;shipments&amp;gt;   
+<span class="number-right">16</span>  &lt;/script&gt;
+<span class="number-right">17</span>  
+<span class="number-right">18</span>  &lt;!-- Run query against db --&gt;   
+<span class="number-right">19</span>  &lt;query connection-id="mydb"&gt;   
+<span class="number-right">20</span>    &lt;!-- Select all shipments with pckp_dt TODAY and inbnd_ind = O from shipmentdb--&gt;    
+<span class="number-right">21</span>    SELECT ship_id, no_pce, tot_wght FROM shipment;
+<span class="number-right">22</span>    
+<span class="number-right">23</span>    &lt;!-- For each row execute a script and write xml structure to out file --&gt;    
+<span class="number-right">24</span>    &lt;script connection-id="outfile"&gt;   
+<span class="number-right">25</span>    &lt;![CDATA[  
+<span class="number-right">26</span>      &lt;shipment&gt;    
+<span class="number-right">27</span>      &lt;id&gt;$ship_id&lt;/id&gt; 
+<span class="number-right">28</span>      &lt;weight&gt;$tot_wght&lt;/weight&gt; 
+<span class="number-right">29</span>      &lt;pieces&gt;$no_pce&lt;/pieces&gt;   
+<span class="number-right">30</span>      &lt;/shipment&gt;]]&gt;    
+<span class="number-right">31</span>    &lt;/script&gt;
+<span class="number-right">32</span>  &lt;/query&gt;   
+<span class="number-right">33</span>​
+<span class="number-right">34</span>  &lt;!--Writing footer --&gt;   
+<span class="number-right">35</span>  &lt;script connection-id="outfile"&gt;      
+<span class="number-right">36</span>    &amp;lt;/shipments&amp;gt;  
+<span class="number-right">37</span>  &lt;/script&gt;    
+<span class="number-right">38</span>&lt;/etl&gt; 
+<span class="number-right">39</span> 
+</pre>
+</div>
+
+</div>
+<h3 class="Subsection">
+<a class="toc" name="toc-Subsection-2.2.2">2.2.2</a> <a class="Label" name="label:FTPSend-configuration"> </a>FTPSend configuration
+</h3>
+<div class="Unindented">
+The FTPSend class enable transfer over FTP to a remote server. This can typical be used as part of the of a etljob where files are created by a scriptella script that is after creation is transfered to a FTP server.
+</div>
+<div class="Indented">
+The FTPSend configuration takes a number of properties to control the connection. 
+</div>
+<ul>
+<li>
+<i>hostname</i> - the name or IP of the ftp server to connect to.
+</li>
+<li>
+<i>port</i> - the socket port used by the ftp server, default is 21.
+</li>
+<li>
+<i>timeout</i> - connection timeout, default is 2000 ms.
+</li>
+<li>
+<i>username</i> - username for the ftp server.
+</li>
+<li>
+<i>password</i> - password for the username
+</li>
+<li>
+<i>transferMode</i> - ascii or binary, default is ascii
+</li>
+<li>
+<i>connectionMode</i> - active or passive, default is passive.
+</li>
+<li>
+<i>remoteDir</i> - the directory on ftp server side, default is the current directory after login.
+</li>
+<li>
+<i>localDir</i> - the directory on the local side.
+</li>
+<li>
+<i>moveFileAfterSend</i> - move the files after transfer to the directory .save in the localDir default is true. If set to false the file is just deleted after successful transfer.
+</li>
+
+</ul>
+<div class="Unindented">
+As and example see the listing in the <a class="Reference" href="#label:bisdw.xml-configuration">2.1 on page 1↑</a> that read any file located in the <i>/tmp/shipment</i> directory.
+</div>
+<h2 class="Section">
+<a class="toc" name="toc-Section-2.3">2.3</a> <a class="Label" name="label:properties.xml"> </a>properties.xml
+</h2>
+<div class="Unindented">
+The properties.xml include properties used by the core of Bisdw. The properties xml has a simple structure of key/value pair: 
+</div>
+<div class="Indented">
+<div class="listing">
+<pre class="listing"><span class="number-right">1</span>&lt;properties&gt;
+<span class="number-right">2</span>	&lt;property&gt; 
+<span class="number-right">3</span>		&lt;key&gt;akey&lt;/key&gt; 
+<span class="number-right">4</span>		&lt;value&gt;avalue&lt;/value&gt;   
+<span class="number-right">5</span>	&lt;/property&gt;
+<span class="number-right">6</span>&lt;/properties&gt;
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+The following properties are currently used by core Bisdw:
+</div>
+<ul>
+<li>
+pidfile - the pid file for Bischeck, default is "<i>/var/tmp/bisdw.pid</i>".
+</li>
+
+</ul>
+<h1 class="Chapter">
+<a class="toc" name="toc-Chapter-3">3</a> <a class="Label" name="label:Building-bischeck"> </a>Building Bisdw
+</h1>
+<div class="Unindented">
+ 
+</div>
+<div class="Indented">
+To build Bisdw from source is simple. Check out the Bisdw trunk from gforge.ingby.com: 
+</div>
+<div class="Indented">
+<div class="listing">
+<pre class="listing">$ svn checkout --username anonymous http://gforge.ingby.com/svn/bischeck/bisdw/trunk bisdw
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+To build a Bisdw distribution run from the directory where you checked out the Bisdw code: 
+</div>
+<div class="Indented">
+<div class="listing">
+<pre class="listing">$ ant dist
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+This will create a compressed tar file in the <i>target</i> directory, named bisdw-x.y.z.tgz where x.y.z is the version number. Different versions of Bisdw can be checked out from the tags directory located in <a class="FlexURL" href="http://gforge.ingby.com/svn/bischeck/bisdw/tags">http://gforge.ingby.com/svn/bischeck/bisdw/tags</a>
+</div>
+<h2 class="Section">
+<a class="toc" name="toc-Section-3.1">3.1</a> <a class="Label" name="label:Jar-customization"> </a>Jar customization
+</h2>
+<div class="Unindented">
+To support custom jar files please place them in the directory <i>customlib</i>. This would typical be jdbc drivers, etc.
+</div>
+<h2 class="Section">
+<a class="toc" name="toc-Section-3.2">3.2</a> <a class="Label" name="label:Developing-with-bisdw"> </a>Developing with Bisdw
+</h2>
+<div class="Unindented">
+Its simple to develop your own ETL config implementation. To develop your own you must follow the interface ETLInf.
+</div>
+<h1 class="Chapter">
+<a class="toc" name="toc-Chapter-4">4</a> <a class="Label" name="label:Installation"> </a>Installation
+</h1>
+<div class="Unindented">
+ 
+</div>
+<div class="Indented">
+The latest binary version of Bisdw is available on <a class="FlexURL" href="http://gforge.ingby.com/gf/project/bischeck/frs/">http://gforge.ingby.com/gf/project/bischeck/frs/</a>. 
+</div>
+<div class="Indented">
+Download the distribution file and follow the steps below to install. Make sure you have root privileges doing this. 
+</div>
+<div class="Indented">
+<div class="listing">
+<pre class="listing"># tar xzvf bisdw-x.y.z.tgz 
+# cd bisdw-x.y.z
+# chmod 755 install 
+# ./install -u #Get usage
+# ./install    #Install default
+# service bisdw start    #Redhat/Centos
+# /etc/init.d/bischeck start #Debian/Ubuntu
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+To get full list of available options to the install script use -u. By default the <i>install</i> script will install Bisdw in directory <i>/opt/socbox/addons/bis</i>dw, referred to as <i>$BISDW</i> and with the ownership of the user id <i>bisdw</i>. Make sure that the user exist before running install.
+</div>
+<div class="Indented">
+The last commands start the bisdw daemon with the effective user id of the user id set during install, default user <i>bisdw</i>. The installation will configure <i>bisdwd</i> to start automatically in run level 3, 4 and 5.
+</div>
+<div class="Indented">
+The process id of the java process running bisdw in daemon mode is located in a file, default in <i>/var/tmp/bisdw.pid</i>. This file is used by the <i>bisdwd</i> script to stop the java program running Bisdw and make sure that only one instance of Bisdw is started on the server.
+</div>
+<h2 class="Section">
+<a class="toc" name="toc-Section-4.1">4.1</a> <a class="Label" name="label:Getting-started"> </a>Getting started
+</h2>
+<div class="Unindented">
+In the <i>$BISDW/etc</i> directory there are examples of all the configuration files. 
+</div>
+<h2 class="Section">
+<a class="toc" name="toc-Section-4.2">4.2</a> <a class="Label" name="label:Logging"> </a>Logging
+</h2>
+<div class="Unindented">
+Bisdw use log4j for log management. The log4j configuration is described in the log4.properties file located in the <i>resources</i> directory of the Bisdw installation. By default Bisdw writes log information at level INFO to file <i>/var/tmp/bischeck.log</i>. 
+</div>
+<h1 class="Chapter">
+<a class="toc" name="toc-Chapter-5">5</a> <a class="Label" name="label:Run-Bisdw-from"> </a>Run Bisdw from the command line
+</h1>
+<div class="Unindented">
+ 
+</div>
+<div class="Indented">
+The normal way to run Bisdw is as a daemon using the init.d script <i>bisdwd</i>, but is also possible to start Bisdw in continues running mode by executing:
+</div>
+<div class="Indented">
+<div class="listing">
+<pre class="listing">$ bisdw Execute -d
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+Running in this way have limitations since the execution will not automatically be placed as a background process and the effective user id will be the user starting the process which may not have all permissions according to the installation. Neither will pid files be updated correctly. For production system always use the init.d script. 
+</div>
+<div class="Indented">
+<div class="listing">
+<pre class="listing">$ sudo /etc/init.d/bisdwd start
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+or
+</div>
+<div class="Indented">
+<div class="listing">
+<pre class="listing"># service bisdwd start
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+For testing purpose it can be good to just run Bisdw once and make sure that every thing is executing as expected. This is done by executing:
+</div>
+<div class="Indented">
+To show the pid file used for the Bischeck daemon running:
+</div>
+<div class="Indented">
+<div class="listing">
+<pre class="listing">$ bischeck ConfigurationManager -p
+</pre>
+</div>
+
+</div>
+<div class="Indented">
+This command is used in the init script bischeckd to retrieve the current pid.
+</div>
+<h2 class="Section">
+<a class="toc" name="toc-Section-5.1">5.1</a> <a class="Label" name="label:Validating-configuration-files"> </a>Validating configuration files
+</h2>
+<div class="Unindented">
+To validate if the xml configuration files are correct the following command will return 0 if correct. Use $? to see return status.
+</div>
+<div class="Indented">
+<div class="listing">
+<pre class="listing">$ bischeck ConfigurationManager -v; echo $?
+</pre>
+</div>
+
+</div>
+<h1 class="Chapter">
+<a class="toc" name="toc-Chapter-6">6</a> <a class="Label" name="label:Releases"> </a>Releases
+</h1>
+<div class="Unindented">
+ 
+</div>
+<h2 class="Section">
+<a class="toc" name="toc-Section-6.1">6.1</a> <a class="Label" name="label:Release-0.2.0"> </a>Release 0.2.0 - 2013-10-06
+</h2>
+<div class="Unindented">
+This is the first major version.
+</div>
+<h1 class="Chapter">
+<a class="toc" name="toc-Chapter-7">7</a> <a class="Label" name="label:System-requirements"> </a>System requirements
+</h1>
+<div class="Unindented">
+ 
+</div>
+<div class="Indented">
+Bisdw should run on any operating system that supports Java 6. The installation script and init scripts are supported on Redhat and Debian equivalent Linux distributions. Running on none Linux operating system has not been tested.
+</div>
+<div class="Indented">
+The following jar packages are distributed as part of the Bisdw distribution. All these packages have their own open source licenses. 
+</div>
+<ul>
+<li>
+scriptella-core.jar, scriptella-drivers.jar, scriptella.jar and scriptella-tools.jar version 1.1 <a class="FlexURL" href="http://scriptella.javaforge.com/">http://scriptella.javaforge.com/</a><ul>
+<li>
+<a class="FlexURL" href="http://www.apache.org/licenses/LICENSE-2.0.html">http://www.apache.org/licenses/LICENSE-2.0.html</a> 
+</li>
+
+</ul>
+
+</li>
+<li>
+commons-net-3.3.jar <a class="FlexURL" href="http://commons.apache.org/proper/commons-jexl/">http://commons.apache.org/proper/commons-jexl/</a><ul>
+<li>
+<a class="FlexURL" href="http://www.apache.org/licenses/LICENSE-2.0.html">http://www.apache.org/licenses/LICENSE-2.0.html</a>
+</li>
+
+</ul>
+
+</li>
+<li>
+commons-jexl.jar <a class="FlexURL" href="http://commons.apache.org/proper/commons-jexl/">http://commons.apache.org/proper/commons-jexl/</a><ul>
+<li>
+<a class="FlexURL" href="http://www.apache.org/licenses/LICENSE-2.0.html">http://www.apache.org/licenses/LICENSE-2.0.html</a>
+</li>
+
+</ul>
+
+</li>
+<li>
+commons-logging.jar <a class="FlexURL" href="http://commons.apache.org/proper/commons-logging/">http://commons.apache.org/proper/commons-logging/</a><ul>
+<li>
+<a class="FlexURL" href="http://www.apache.org/licenses/LICENSE-2.0.html">http://www.apache.org/licenses/LICENSE-2.0.html</a>
+</li>
+
+</ul>
+
+</li>
+<li>
+metrics-core.jar - <a class="FlexURL" href="https://github.com/codahale/metrics">https://github.com/codahale/metrics</a> <ul>
+<li>
+<a class="FlexURL" href="http://www.apache.org/licenses/LICENSE-2.0.html">http://www.apache.org/licenses/LICENSE-2.0.html</a>
+</li>
+
+</ul>
+
+</li>
+<li>
+log4j-1.2.16.jar - <a class="FlexURL" href="http://logging.apache.org/log4j/">http://logging.apache.org/log4j/</a> <ul>
+<li>
+<a class="FlexURL" href="http://www.apache.org/licenses/LICENSE-2.0.html">http://www.apache.org/licenses/LICENSE-2.0.html</a> 
+</li>
+
+</ul>
+
+</li>
+<li>
+commons-lang-2.5.jar - <a class="FlexURL" href="http://commons.apache.org/lang/">http://commons.apache.org/lang/</a> <ul>
+<li>
+<a class="FlexURL" href="http://www.apache.org/licenses/LICENSE-2.0.html">http://www.apache.org/licenses/LICENSE-2.0.html</a> 
+</li>
+
+</ul>
+
+</li>
+<li>
+commons-cli-1.2.jar - <a class="FlexURL" href="http://commons.apache.org/cli/">http://commons.apache.org/cli/</a> <ul>
+<li>
+<a class="FlexURL" href="http://www.apache.org/licenses/LICENSE-2.0.html">http://www.apache.org/licenses/LICENSE-2.0.html</a> 
+</li>
+
+</ul>
+
+</li>
+<li>
+slf4j-api-1.6.0.jar - <a class="FlexURL" href="http://www.slf4j.org/">http://www.slf4j.org/</a> <ul>
+<li>
+<a class="FlexURL" href="http://www.opensource.org/licenses/mit-license.php">http://www.opensource.org/licenses/mit-license.php</a>
+</li>
+
+</ul>
+
+</li>
+<li>
+slf4j-log4j12-1.6.0.jar - <a class="FlexURL" href="http://www.slf4j.org/">http://www.slf4j.org/</a><ul>
+<li>
+<a class="FlexURL" href="http://www.opensource.org/licenses/mit-license.php">http://www.opensource.org/licenses/mit-license.php</a>
+</li>
+
+</ul>
+
+</li>
+<li>
+quartz-2.2.1.jar - <a class="FlexURL" href="http://www.quartz-scheduler.org/">http://www.quartz-scheduler.org/</a><ul>
+<li>
+<a class="FlexURL" href="http://www.apache.org/licenses/LICENSE-2.0.html">http://www.apache.org/licenses/LICENSE-2.0.html</a> 
+</li>
+
+</ul>
+
+</li>
+
+</ul>
+<div class="Unindented">
+All files are distributed as part of Bisdw are located in the lib directory. 
+</div>
+<h1 class="Chapter">
+<a class="toc" name="toc-Chapter-8">8</a> <a class="Label" name="label:bisdw-license"> </a>Bisdw license 
+</h1>
+<div class="Unindented">
+ 
+</div>
+<div class="Indented">
+Bisdw is licensed under GNU license version 2. For more info please visit <a class="FlexURL" href="http://www.gnu.org/licenses/gpl-2.0.htm">http://www.gnu.org/licenses/gpl-2.0.htm</a>l
+</div>
+<h1 class="Chapter">
+<a class="toc" name="toc-Chapter-9">9</a> <a class="Label" name="label:Bug-reports-and"> </a>Bug reports and feature requests
+</h1>
+<div class="Unindented">
+ 
+</div>
+<div class="Indented">
+Please submit bug reports and feature requests on <a class="FlexURL" href="gforge.ingby.com">gforge.ingby.com</a>
+</div>
+<h1 class="Chapter">
+<a class="toc" name="toc-Chapter-10">10</a> <a class="Label" name="label:Credits"> </a>Credits
+</h1>
+<div class="Unindented">
+ 
+</div>
+<div class="Indented">
+Thanks to all people who has developed all the great software that Bisdw depends on.
+</div>
+
+<hr class="footer"/>
+<div class="footer" id="generated-by">
+Document generated by <a href="http://elyxer.nongnu.org/">eLyXer 1.2.3 (2011-08-31)</a> on <span class="create-date">2013-10-10T20:39:59.881946</span>
+</div>
+</div>
+</body>
+</html>
