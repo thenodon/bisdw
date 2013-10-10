@@ -451,10 +451,11 @@ public class ConfigurationManager {
 				configMgr.initProperties();
 				configMgr.initBisdw();
 
-				// Verify all structures
-				if (configMgr.getPidFile().canWrite()) {
-					throw new Exception("Can not write to pid file " + configMgr.getPidFile());
-				}
+				if (!configMgr.checkPidFile()) {
+	        		LOGGER.error("Can not write to pid file " + configMgr.getPidFile());
+	        		throw new Exception("Can not write to pid file " + configMgr.getPidFile());
+	        	}
+				
 			} catch (Exception e) {
 				LOGGER.error("Configuration Manager initzialization failed with " + e);
 				throw e;
@@ -462,7 +463,24 @@ public class ConfigurationManager {
 		}
 	}
 
-
+	
+	public  boolean checkPidFile() {
+		File pidfile = getPidFile();
+		if (pidfile.exists()) {
+			if (pidfile.canWrite())
+				return true;
+			else
+				return false;
+		}
+		else {
+			if(new File(pidfile.getParent()).canWrite())
+				return true;
+			else
+				return false;
+		}
+	}
+	
+	
 	/*
 	 * Public Configuration methods
 	 */
